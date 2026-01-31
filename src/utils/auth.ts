@@ -5,7 +5,7 @@ export const refreshAccessToken = async (): Promise<string | null> => {
   if (!refresh) return null;
 
   try {
-    const res = await axios.post('http://localhost:8000/api/token/refresh/', {
+    const res = await axios.post('http://localhost:8000/api/users/token/refresh/', {
       refresh,
     });
 
@@ -13,7 +13,7 @@ export const refreshAccessToken = async (): Promise<string | null> => {
     localStorage.setItem('access', newAccess);
     return newAccess;
   } catch (err) {
-    console.error('Refresh token invalide ou expiré');
+    console.error('Refresh token invalide ou expiré',err);
     localStorage.removeItem('access');
     localStorage.removeItem('refresh');
     return null;

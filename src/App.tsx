@@ -34,6 +34,7 @@ import PlanForm from './components/PlanForm';
 import RecommendationsPage from './pages/RecommendationsPage';
 import BadgePage from './pages/BadgePage';
 import CorporateOffersPage from './pages/CorporateOffersPage';
+import ActivityDetailPage from './pages/ActivityDetailPage';
 
 
 import { ToastContainer } from 'react-toastify';
@@ -42,6 +43,7 @@ import LegalPage from './pages/LegalPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import FaqPage from './pages/FaqPage';
 import SitemapPage from './pages/SitemapPage';
+import CookieConsentBanner from './components/CookieConsentBanner';
 
 function App() {
   return (
@@ -59,6 +61,7 @@ function App() {
               <Route path="/invite-employee" element={<InviteEmployee />} />
               <Route path="/accept-invite" element={<AcceptInvitationPage />} />
               <Route path="/activities" element={<ActivitiesPage />} />
+              <Route path="/activities/:id" element={<ActivityDetailPage />} />
 
               {/* B2C Authenticated */}
               <Route path="/dashboard" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
@@ -102,6 +105,7 @@ function App() {
           <Footer />
           <ToastContainer />
         </div>
+        <CookieConsentBanner />
       </Router>
     </AuthProvider>
   );

@@ -1,6 +1,6 @@
-// File: src/pages/ActivitiesPage.tsx
+// src/pages/ActivitiesPage.tsx
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
 import { useAuth } from '../contexts/AuthContext';
 import CountUp from 'react-countup';
@@ -20,43 +20,28 @@ import {
   ResponsiveContainer
 } from 'recharts';
 
-interface Activity {
-  id: number;
-  name: string;
-  description: string;
-  category: string;
-  location: string;
-  date: string;
-  time: string;
-  duration: string;
-  participants: number;
-  max_participants: number;
-  price: string;
-  level: string;
-  sport_zen: boolean;
-  rating: number;
-  instructor?: string;
-  image?: string;
-}
 
+import type { Activity, Booking } from '../types';
 const ITEMS_PER_PAGE = 9;
 
 const ActivitiesPage: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const [activities, setActivities] = useState<Activity[]>([]);
-  const [registered, setRegistered] = useState<Set<number>>(new Set());
+  // const [registered, setRegistered] = useState<Set<number>>(new Set());
+  const [registrations, setRegistrations] = useState<Map<number, number>>(new Map());
   const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const getImageUrl = (img?: string) => {
+  const getImageUrl = (img: string | null | undefined) => {
     if (!img) return '/images/activity-default.jpg';
     // Si c'est déjà une URL (http), renvoie-la directement
     if (/^https?:\/\//i.test(img)) return img;
     // Sinon, concatène via la variable d'env (VITE_MEDIA_URL ou REACT_APP_MEDIA_URL, selon ton build tool)
     return `${import.meta.env.VITE_MEDIA_URL}${img}`;
   };
+
 
   // Filtres de recherche
   const [searchTerm, setSearchTerm] = useState('');
@@ -68,43 +53,62 @@ const ActivitiesPage: React.FC = () => {
   const [selectedLevel, setSelectedLevel] = useState<string>('');
 
   useEffect(() => {
-    (async () => {
+    const fetchActivitiesAndBookings = async () => {
       setLoading(true);
       try {
-        const allRes = await axiosInstance.get<Activity[]>('/activities/');
-        setActivities(allRes.data);
+        // 1. Récupérer toutes les activités (inchangé)
+        const allActivitiesRes = await axiosInstance.get<Activity[]>('/activities/');
+        setActivities(allActivitiesRes.data);
+
+        // 2. Si l'utilisateur est connecté, récupérer ses réservations
         if (isAuthenticated) {
-          const myRes = await axiosInstance.get<Activity[]>('/activities/my-activities/');
-          setRegistered(new Set(myRes.data.map(a => a.id)));
+          const myBookingsRes = await axiosInstance.get<Booking[]>('/bookings/');
+
+          // Crée une nouvelle Map à partir des réservations
+          const registrationMap = new Map<number, number>();
+          myBookingsRes.data.forEach(booking => {
+            // Pour chaque réservation, on associe l'ID de l'activité à l'ID de la réservation
+            registrationMap.set(booking.activity.id, booking.id);
+          });
+
+          setRegistrations(registrationMap);
         }
-      } catch {
-        alert('Erreur lors du chargement des activités.');
+      } catch (error) {
+        console.error("Erreur lors du chargement des données:", error);
+        alert('Erreur lors du chargement des données.');
       } finally {
         setLoading(false);
       }
-    })();
+    };
+
+    fetchActivitiesAndBookings();
   }, [isAuthenticated]);
 
   // Filtrage + tri chronologique
   const filtered = useMemo(() => {
     return activities
-      .filter(a => {
-        if (searchTerm &&
-          !(
-            a.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            a.description.toLowerCase().includes(searchTerm.toLowerCase())
-          )
-        ) return false;
+        .filter(a => {
+          if (searchTerm) {
+            const lowercasedSearchTerm = searchTerm.toLowerCase();
+
+            // On vérifie si le nom correspond
+            const nameMatches = a.name.toLowerCase().includes(lowercasedSearchTerm);
+
+            // --- CORRECTION ICI ---
+            // On vérifie d'abord que description existe, PUIS on vérifie si elle correspond.
+            const descriptionMatches = a.description ? a.description.toLowerCase().includes(lowercasedSearchTerm) : false;
+
+            // Si ni le nom, ni la description ne correspondent, on filtre l'élément.
+            if (!nameMatches && !descriptionMatches) {
+              return false;
+            }
+          }
         if (categoryFilter && a.category !== categoryFilter) return false;
-        if (locationFilter && a.location !== locationFilter) return false;
-        if (dateFilter && a.date !== dateFilter) return false;
-        return true;
+        if (locationFilter && a.effective_location !== locationFilter) return false;
+        return !(dateFilter && !a.start_time.startsWith(dateFilter));
+
       })
-      .sort((a, b) => {
-        const da = new Date(`${a.date}T${a.time}`).getTime();
-        const db = new Date(`${b.date}T${b.time}`).getTime();
-        return da - db;
-      });
+        .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
   }, [activities, searchTerm, categoryFilter, locationFilter, dateFilter]);
 
   // Pagination
@@ -138,7 +142,7 @@ const ActivitiesPage: React.FC = () => {
   const monthlyActivity = useMemo(() => {
     const map = new Map<string, number>();
     activities.forEach(a => {
-      const month = a.date.slice(0, 7);
+      const month = a.start_time.slice(0, 7);
       map.set(month, (map.get(month) || 0) + 1);
     });
     return Array.from(map.entries())
@@ -150,28 +154,59 @@ const ActivitiesPage: React.FC = () => {
   const totalActivities = activities.length;
 
   // Gestion inscription/désinscription
+  // Dans ActivitiesPage.tsx
+
   const handleRegisterClick = async (act: Activity) => {
     if (!isAuthenticated) {
       navigate('/login', { state: { from: '/activities' } });
       return;
     }
+
     try {
-      const isReg = registered.has(act.id);
-      const res = isReg
-        ? await axiosInstance.delete<{ participants: number }>(`/activities/${act.id}/register/`)
-        : await axiosInstance.post<{ participants: number }>(`/activities/${act.id}/register/`);
-      setActivities(prev =>
-        prev.map(a => a.id === act.id ? { ...a, participants: res.data.participants } : a)
-      );
-      setRegistered(prev => {
-        const s = new Set(prev);
-        isReg ? s.delete(act.id) : s.add(act.id);
-        return s;
-      });
-    } catch {
+      // On vérifie si l'activité est dans notre Map
+      const isRegistered = registrations.has(act.id);
+
+      if (isRegistered) {
+        // --- SUPPRESSION (CORRIGÉ) ---
+        // On récupère l'ID de la réservation depuis la Map
+        const bookingId = registrations.get(act.id);
+
+        // On appelle DELETE sur l'URL de la ressource spécifique
+        await axiosInstance.delete(`/bookings/${bookingId}/`);
+
+        // Mettre à jour l'état local
+        setRegistrations(prev => {
+          const newMap = new Map(prev);
+          newMap.delete(act.id);
+          return newMap;
+        });
+        // Optionnel : Mettre à jour le compteur de participants
+        setActivities(prev => prev.map(a => a.id === act.id ? { ...a, participants_count: a.participants_count - 1 } : a));
+
+      } else {
+        // --- CRÉATION (CORRIGÉ) ---
+        // On envoie l'ID de l'activité que l'on veut réserver
+        const response = await axiosInstance.post<Booking>('/bookings/', {
+          activity: act.id
+        });
+        console.log("response",response)
+        const newBooking = response.data.activity;
+
+        // Mettre à jour l'état local
+        setRegistrations(prev => {
+          const newMap = new Map(prev);
+          newMap.set(act.id, newBooking.id);
+          return newMap;
+        });
+        // Optionnel : Mettre à jour le compteur de participants
+        setActivities(prev => prev.map(a => a.id === act.id ? { ...a, participants_count: a.participants_count + 1 } : a));
+      }
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de l'inscription:", error);
       alert('Erreur lors de la mise à jour de votre inscription.');
     }
   };
+
 
   if (loading) return <div className="p-6 text-center">Chargement…</div>;
 
@@ -206,7 +241,7 @@ const ActivitiesPage: React.FC = () => {
             className="p-2 rounded-lg border"
           >
             <option value="">Tous lieux</option>
-            {[...new Set(activities.map(a => a.location))].map(l => (
+            {[...new Set(activities.map(a => a.effective_location))].map(l => (
               <option key={l} value={l}>{l}</option>
             ))}
           </select>
@@ -221,8 +256,8 @@ const ActivitiesPage: React.FC = () => {
         {/* Grille */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
           {displayed.map(act => {
-            const isFull = act.participants >= act.max_participants;
-            const isReg = registered.has(act.id);
+            const isFull = act.participants_count >= act.max_participants;
+            const isReg = registrations.has(act.id);
             return (
               <div key={act.id} className="bg-white rounded-2xl shadow-lg flex flex-col overflow-hidden">
                 <img
@@ -233,18 +268,22 @@ const ActivitiesPage: React.FC = () => {
                 <div className="p-4 flex-1 flex flex-col justify-between">
                   <div>
                     <div className="flex justify-between items-center mb-2">
-                      <h2 className="text-xl font-semibold text-[#0a1128]">{act.name}</h2>
+                      <Link to={`/activities/${act.id}`} className="hover:text-[#dc5f18] transition-colors">
+                        <h2 className="text-xl font-semibold text-[#0a1128]">{act.name}</h2>
+                      </Link>
+
+
                       <div className="flex items-center space-x-1 text-[#dc5f18]">
-                        <Star className="w-4 h-4" /> <span>{act.rating.toFixed(1)}</span>
+                        <Star className="w-4 h-4" /> <span></span>
                       </div>
                     </div>
                     <ul className="text-sm text-gray-600 space-y-1 mb-4">
-                      <li className="flex items-center gap-2"><MapPin className="w-4 h-4" /> {act.location}</li>
+                      <li className="flex items-center gap-2"><MapPin className="w-4 h-4" /> {act.effective_location}</li>
                       <li className="flex items-center gap-2"><MapPin className="w-4 h-4" /> {act.level}</li>
-                      <li className="flex items-center gap-2"><CalendarIcon className="w-4 h-4" /> {act.date}</li>
-                      <li className="flex items-center gap-2"><Clock className="w-4 h-4" /> {act.time} • {act.duration}</li>
+                      <li className="flex items-center gap-2"><CalendarIcon className="w-4 h-4" /> {new Date(act.start_time).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</li>
+                      <li className="flex items-center gap-2"><Clock className="w-4 h-4" /> {new Date(act.start_time).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} • {act.duration.slice(0, 5)}</li>
                       <li className="flex items-center gap-2">
-                        <Users className="w-4 h-4" /> {act.participants}/{act.max_participants}
+                        <Users className="w-4 h-4" /> {act.participants_count}/{act.max_participants}
                         {isFull && !isReg && <span className="ml-2 text-red-600 font-semibold">En attente</span>}
                       </li>
                       <li><strong>Prix :</strong> {act.price}</li>

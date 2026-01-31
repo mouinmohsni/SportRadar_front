@@ -8,11 +8,11 @@ const PUBLIC_ENDPOINTS = [
   '/token/refresh/',
   '/weather/',                    // API météo
   '/places/',                     // liste des lieux labellisés
-  '/activities/recommendations/', // recommandations
+  '/activities/', // recommandations
 ];
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
   headers: { 'Content-Type': 'application/json' },
 });
 

@@ -9,3 +9,4 @@ services:
     publishPath: dist             # Dossier généré par Vite (build output)
     staticPublish:
       fallback: index.html        # Fallback pour SPA (React Router)
+

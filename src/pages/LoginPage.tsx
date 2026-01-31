@@ -60,7 +60,7 @@ const LoginPage: React.FC = () => {
       }
 
       // sinon on récupère le profil pour déterminer la redirection
-      const { data: me } = await axiosInstance.get<Me>('/me/');
+      const { data: me } = await axiosInstance.get<Me>('/users/me/');
       if (me.is_staff) {
         navigate('/admin', { replace: true });
       } else if (me.type === 'business') {

@@ -1,23 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axiosInstance from '../api/axiosInstance';
+import type {User} from "../types";
 
-interface Company {
-  id: number;
-  name: string;
-  plan: { name: string; price: number; billing_period: string; };
-  is_active: boolean;
-}
-interface User {
-  id: number;
-  email: string;
-  username: string;
-  type: 'personal' | 'business';
-  preferences?: any;
-  avatar?: string;
-  is_staff: boolean;
-  company?: Company;
-  isCompanyAdmin?: boolean;
-}
+
+
 
 interface AuthContextType {
   user: User | null;
@@ -25,6 +11,7 @@ interface AuthContextType {
   logout: () => void;
   isAuthenticated: boolean;
   updateUser: (updates: Partial<User>) => Promise<void>;
+  fetchMe: () => Promise<void>;
 }
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuth = () => {
@@ -38,7 +25,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchMe = async () => {
     try {
-      const res = await axiosInstance.get('/me/');
+      const res = await axiosInstance.get('/users/me/');
+      console.log("res",res)
       setUser(res.data);
     } catch {
       logout();
@@ -46,9 +34,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const login = async (email: string, password: string) => {
-    const { data } = await axiosInstance.post('/token/', { email, password });
+    const { data } = await axiosInstance.post('/users/token/', { email, password });
     localStorage.setItem('access', data.access);
     localStorage.setItem('refresh', data.refresh);
+    console.log("data",data)
     await fetchMe();
   };
   const logout = () => {
@@ -57,7 +46,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
   };
   const updateUser = async (updates: Partial<User>) => {
-    const { data } = await axiosInstance.patch('/me/', updates);
+    const { data } = await axiosInstance.patch(`/users/${user?.id}/`, updates);
     setUser(prev => ({ ...prev!, ...data }));
     return data;
   };
@@ -67,7 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated, updateUser }}>
+    <AuthContext.Provider value={{ user, login, logout, isAuthenticated, updateUser ,fetchMe }}>
       {children}
     </AuthContext.Provider>
   );

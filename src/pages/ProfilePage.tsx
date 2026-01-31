@@ -1,63 +1,53 @@
-import React, { useEffect, useState } from 'react';
+
+import React, { useEffect, useState, } from 'react';
 import type { ChangeEvent } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import axiosInstance from '../api/axiosInstance';
 import { useNavigate } from 'react-router-dom';
 import avatarOptions from '../assets/avatars';
 import { Helmet } from 'react-helmet-async';
+import type {  UserPreferences } from "../types";
+import axios from "axios";
+import { getMediaUrl } from '../utils/media';
 
-const locationOptions = [
-  'Paris',
-  'Lyon',
-  'Marseille',
-  'Bordeaux',
-  'Nice'
-];
-
+// --- Listes de constantes, ne changent pas ---
+const locationOptions = ['Paris', 'Lyon', 'Marseille', 'Bordeaux', 'Nice'];
 const allObjectives = [
-  'Perte de poids',
-  'Renforcement musculaire',
-  'Réduction du stress',
-  'Amélioration de la flexibilité',
-  'Endurance cardio',
-  'Bien-être général',
-  'Socialisation'
+  'Perte de poids', 'Renforcement musculaire', 'Réduction du stress',
+  'Amélioration de la flexibilité', 'Endurance cardio', 'Bien-être général', 'Socialisation'
 ];
-
-type Preferences = {
-  activities: string[];
-  location: string;
-  level: string;
-  objectives: string[];
-};
 
 const ProfilePage: React.FC = () => {
-  const { user, isAuthenticated, updateUser } = useAuth();
+  const { user,  updateUser, fetchMe } = useAuth();
   const navigate = useNavigate();
 
-  const [preferences, setPreferences] = useState<Preferences>({
-    activities: [],
-    location: '',
-    level: '',
-    objectives: []
-  });
+  // --- CORRECTION PROBLÈME N°1 : Initialisation de l'état ---
+  // On initialise l'état des préférences DIRECTEMENT à partir de 'user'.
+  // Si 'user' ou 'user.preferences' n'existent pas, on fournit une valeur par défaut.
+  // Cela évite d'avoir besoin d'un useEffect pour initialiser, ce qui causait la boucle infinie.
+  const [preferences, setPreferences] = useState<UserPreferences>(
+      user?.preferences || { location: '', level: '', objectives: [] }
+  );
+
   const [status, setStatus] = useState('');
   const [avatarPreview, setAvatarPreview] = useState(avatarOptions.default);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  // Ce useEffect se déclenche SEULEMENT si l'objet 'user' du contexte change VRAIMENT.
+  // Il est maintenant sûr et ne causera pas de boucle.
   useEffect(() => {
-    if (!isAuthenticated || !user) return;
-    setPreferences({
-      activities: user.preferences?.activities || [],
-      location: user.preferences?.location || '',
-      level: user.preferences?.level || '',
-      objectives: user.preferences?.objectives || []
-    });
-    const key = user.avatar || 'default';
-    setAvatarPreview(avatarOptions[key as keyof typeof avatarOptions] || avatarOptions.default);
-  }, [user, isAuthenticated]);
-
+    if (user) {
+      // Synchronise les préférences si elles existent dans le contexte
+      setPreferences(user.preferences || { location: '', level: '', objectives: [] });
+      // Synchronise l'aperçu de l'avatar
+      const avatarUrl = getMediaUrl(user.avatar);
+      console.log("avatarUrl",user)
+      setAvatarPreview(avatarUrl || avatarOptions.default);
+    }
+  }, [user]); // La seule dépendance est 'user'.
+ console.log(avatarPreview)
+  // --- Fonctions de gestion du formulaire (inchangées) ---
   const handleChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
     setPreferences(prev => ({ ...prev, [name]: value }));
@@ -67,69 +57,99 @@ const ProfilePage: React.FC = () => {
     const { value, checked } = e.target;
     setPreferences(prev => ({
       ...prev,
-      objectives: checked
-        ? [...prev.objectives, value]
-        : prev.objectives.filter(o => o !== value)
+      objectives: checked ? [...prev.objectives, value] : prev.objectives.filter(o => o !== value)
     }));
   };
 
-  const handleAvatarUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+  // --- CORRECTION PROBLÈME N°2 : Logique d'upload de fichier ---
+  // Cette fonction est UNIQUEMENT pour l'upload d'un NOUVEAU fichier.
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!user?.id) {
+      setStatus('Erreur : Utilisateur non identifié.');
+      return;
+    }
     const file = e.target.files?.[0];
     if (!file) return;
+
     const form = new FormData();
-    form.append('avatar', file);
+    form.append('avatar', file); // L'API attend un champ 'avatar' de type fichier
+
     setUploading(true);
     setStatus('');
     setAvatarPreview(URL.createObjectURL(file));
+
     try {
-      await axiosInstance.patch('/me/', form, {
+      // On fait un appel PATCH avec FormData, ce qui est correct pour les fichiers.
+      await axiosInstance.patch(`/users/${user.id}/`, form, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
+      await fetchMe(); // On rafraîchit les données de l'utilisateur
       setStatus('Avatar mis à jour ✔️');
-    } catch (err: any) {
-      console.error(err);
-      setStatus('Échec upload avatar ❌');
+    } catch (error: unknown) {
+      // ... (gestion d'erreur inchangée)
+      let errorMessage = 'Une erreur inconnue est survenue.';
+      if (axios.isAxiosError(error)) {
+        errorMessage = error.response?.data?.avatar?.[0] || error.message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      setStatus(`Échec de l'upload : ${errorMessage} ❌`);
     } finally {
       setUploading(false);
     }
   };
 
+  // --- CORRECTION PROBLÈME N°2 : Logique de sélection d'avatar pré-défini ---
+  // Cette fonction est UNIQUEMENT pour choisir un avatar de la liste.
   const handleAvatarSelect = async (key: string) => {
-    if (uploading || saving) return;
+    if (uploading || saving || !user) return;
+
     setUploading(true);
     setStatus('');
-    const url = avatarOptions[key as keyof typeof avatarOptions];
-    setAvatarPreview(url);
+    setAvatarPreview(avatarOptions[key as keyof typeof avatarOptions]);
+
     try {
+      // On utilise la fonction 'updateUser' du contexte, qui envoie du JSON.
+      // C'est correct car on envoie juste la clé de l'avatar, pas un fichier.
       await updateUser({ avatar: key });
       setStatus('Avatar mis à jour ✔️');
-    } catch (err: any) {
-      console.error(err);
-      setStatus('Échec sélection avatar ❌');
+    } catch (error: unknown) {
+      // ... (gestion d'erreur inchangée)
+      let errorMessage = 'Une erreur inconnue est survenue.';
+      if (axios.isAxiosError(error)) {
+        errorMessage = error.response?.data?.detail || error.message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      setStatus(`Erreur : ${errorMessage}`);
     } finally {
       setUploading(false);
     }
   };
 
+  // --- Logique de soumission du profil (inchangée) ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    setStatus('');
     try {
-      await axiosInstance.patch('/me/', { preferences });
-      setStatus('Préférences mises à jour ✔️');
+      await updateUser({ preferences: preferences });
+      alert('Profil mis à jour avec succès !');
       navigate('/activities');
-    } catch (err: any) {
-      console.error(err);
-      setStatus('Erreur mise à jour ❌');
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du profil", error);
+      alert('Erreur lors de la mise à jour.');
     } finally {
       setSaving(false);
     }
   };
 
-  if (!isAuthenticated || !user) {
+  // --- Affichage (inchangé) ---
+  if (!user) {
     return <p className="p-6">Chargement du profil…</p>;
   }
+
+  console.log("avatarPreview",avatarPreview)
+
 
   return (
     <>
