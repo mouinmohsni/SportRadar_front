@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
 import type { Activity, ActivityRating, Booking } from '../types';
-import { Helmet } from 'react-helmet-async';
 import { MapPin, Calendar, Clock, Users, Tag, BarChart, User as UserIcon, Building, Star } from 'lucide-react';
 import { getMediaUrl } from '../utils/media';
 import { useAuth } from '../contexts/AuthContext';
