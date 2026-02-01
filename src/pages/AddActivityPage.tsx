@@ -24,11 +24,7 @@ interface ActivityForm {
   is_public: boolean; // Nouveau champ, correspond au modèle Django
 }
 
-interface Coach {
-  id: number;
-  first_name: string;
-  last_name: string;
-}
+
 
 const AddActivityPage: React.FC = () => {
   const navigate = useNavigate();
@@ -147,7 +143,7 @@ const AddActivityPage: React.FC = () => {
       navigate('/activities');
     } catch (error: any) {
       console.error('Erreur lors de l\'enregistrement de l\'activité:', error.response?.data || error.message);
-      toast.error("Erreur lors de l\'enregistrement ❌");
+      toast.error("Erreur lors de l'enregistrement ❌");
     }
   };
 
