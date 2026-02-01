@@ -15,7 +15,7 @@ interface AdminDashboardProps {
     user: User;
 }
 
-const AdminDashboard: React.FC<AdminDashboardProps> = ({ user }) => {
+const AdminDashboard: React.FC<AdminDashboardProps> = () => {
     const navigate = useNavigate();
     const [users, setUsers] = useState<User[]>([]);
     const [companies, setCompanies] = useState<Company[]>([]);

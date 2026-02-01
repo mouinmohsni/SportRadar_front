@@ -53,7 +53,6 @@ const PersonalDashboard: React.FC<PersonalDashboardProps> = ({ user }) => {
             // Récupérer les réservations
             const bookingsResponse = await axiosInstance.get<Booking[]>('/bookings/');
             const bookingsData = bookingsResponse.data;
-            console.log('Bookings data:', bookingsData);
             setBookings(bookingsData);
 
             // Calculer les statistiques
@@ -313,7 +312,7 @@ const PersonalDashboard: React.FC<PersonalDashboardProps> = ({ user }) => {
                                     borderRadius: '8px',
                                     boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                                 }}
-                                formatter={(value: number) => [`${value}h`, 'Durée']}
+                                formatter={(value: any) => [`${value}h`, 'Durée']}
                             />
                             <Bar
                                 dataKey="heures"

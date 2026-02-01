@@ -110,7 +110,7 @@ export interface Booking {
   id: number;
   user: number; // ID de l'utilisateur
   activity: Activity; // Objet activité complet
-  status: 'confirmed' | 'cancelled' | 'pending';
+  status: string;
   created_at: string; // Format ISO 8601
 }
 
