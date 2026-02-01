@@ -1,223 +1,373 @@
 // File: src/components/dashboard/personal/PersonalDashboard.tsx
-import React, { useEffect, useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axiosInstance from '../../../api/axiosInstance';
-import { toast } from 'react-toastify';
-import { Calendar, TrendingUp, Target, Award } from 'lucide-react';
-import StatsCard from '../common/StatsCard';
-import {
-    AreaChart, Area, PieChart, Pie, Cell,
-    XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid
-} from 'recharts';
-import type {Activity, Booking, User} from '../../../types';
+import React, { useState, useEffect } from 'react';
+import { Calendar, TrendingUp, Activity, Clock, MapPin, User as UserIcon } from 'lucide-react';
+import {  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import CountUp from 'react-countup';
+import axios from 'axios';
+import RecommendationsSection from './RecommendationsSection';
 
-interface PersonalDashboardProps {
-    user: User;
+interface Booking {
+    id: number;
+    activity: {
+        id: number;
+        name: string;
+        category: string;
+        duration: number;
+        company: {
+            name: string;
+            city: string;
+        };
+        instructor?: {
+            first_name: string;
+            last_name: string;
+        };
+    };
+    booking_date: string;
+    status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
 }
 
+interface Stats {
+    totalBookings: number;
+    upcomingBookings: number;
+    completedBookings: number;
+    totalHours: number;
+}
 
-const PersonalDashboard: React.FC<PersonalDashboardProps> = ({ user }) => {
-    const navigate = useNavigate();
-    const [activities, setActivities] = useState<Activity[]>([]);
+const PersonalDashboard: React.FC = () => {
+    const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
+    const [bookings, setBookings] = useState<Booking[]>([]);
+    const [stats, setStats] = useState<Stats>({
+        totalBookings: 0,
+        upcomingBookings: 0,
+        completedBookings: 0,
+        totalHours: 0
+    });
     const [loading, setLoading] = useState(true);
+    const [activityData, setActivityData] = useState<any[]>([]);
 
     useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            try {
-                const { data: bookings } = await axiosInstance.get<Booking[]>('/bookings/');
-                const userActivities = bookings
-                    .map(booking => booking.activity)
-                    .filter(Boolean) as Activity[];
-                setActivities(userActivities);
-            } catch {
-                toast.error('Erreur lors du chargement de vos données.');
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
+        fetchDashboardData();
     }, []);
 
-    const today = useMemo(() => new Date(), []);
-    const upcoming = useMemo(() => activities.filter(a => new Date(a.start_time) >= today), [activities, today]);
-    const past = useMemo(() => activities.filter(a => new Date(a.start_time) < today), [activities, today]);
+    const fetchDashboardData = async () => {
+        try {
+            setLoading(true);
+            const token = localStorage.getItem('access_token');
 
-    // Graphique : Activités par mois
-    const activityByMonth = useMemo(() => {
-        const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
-        const counts = Array(12).fill(0);
-        activities.forEach(a => {
-            const month = new Date(a.start_time).getMonth();
-            counts[month]++;
+            // Récupérer les réservations
+            const bookingsResponse = await axios.get('http://localhost:8000/api/bookings/', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const bookingsData = bookingsResponse.data.results || bookingsResponse.data;
+            setBookings(bookingsData);
+
+            // Calculer les statistiques
+            const now = new Date();
+            const upcoming = bookingsData.filter((b: Booking) =>
+                new Date(b.booking_date) > now && b.status !== 'cancelled'
+            );
+            const completed = bookingsData.filter((b: Booking) =>
+                b.status === 'completed' || (new Date(b.booking_date) < now && b.status === 'confirmed')
+            );
+            const totalHours = bookingsData.reduce((sum: number, b: Booking) =>
+                sum + (b.activity.duration / 60), 0
+            );
+
+            setStats({
+                totalBookings: bookingsData.length,
+                upcomingBookings: upcoming.length,
+                completedBookings: completed.length,
+                totalHours: Math.round(totalHours)
+            });
+
+            // Générer les données pour le graphique (activité des 7 derniers jours)
+            generateActivityData(bookingsData);
+        } catch (error) {
+            console.error('Error fetching dashboard data:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const generateActivityData = (bookings: Booking[]) => {
+        const last7Days = Array.from({ length: 7 }, (_, i) => {
+            const date = new Date();
+            date.setDate(date.getDate() - (6 - i));
+            return date;
         });
-        return months.map((name, index) => ({ name, count: counts[index] }));
-    }, [activities]);
 
-    // Graphique : Répartition par catégorie
-    const categoryData = useMemo(() => {
-        const counts: Record<string, number> = {};
-        activities.forEach(a => {
-            counts[a.category] = (counts[a.category] || 0) + 1;
+        const data = last7Days.map(date => {
+            const dayBookings = bookings.filter((b: Booking) => {
+                const bookingDate = new Date(b.booking_date);
+                return bookingDate.toDateString() === date.toDateString();
+            });
+
+            return {
+                date: date.toLocaleDateString('fr-FR', { weekday: 'short' }),
+                activites: dayBookings.length,
+                heures: dayBookings.reduce((sum, b) => sum + (b.activity.duration / 60), 0)
+            };
         });
-        return Object.entries(counts).map(([name, value]) => ({ name, value }));
-    }, [activities]);
 
-    const COLORS = ['#dc5f18', '#0a1128', '#ffc658', '#82ca9d', '#8884d8'];
+        setActivityData(data);
+    };
 
-    // Objectifs
-    const objectivePercent = useMemo(() => {
-        const objectives = user?.preferences?.objectives || [];
-        if (objectives.length === 0) return 0;
-        const done = activities.filter(a => objectives.includes(a.category)).length;
-        return Math.min(100, Math.round((done / objectives.length) * 100));
-    }, [activities, user]);
+    const getUpcomingBookings = () => {
+        const now = new Date();
+        return bookings
+            .filter(b => new Date(b.booking_date) > now && b.status !== 'cancelled')
+            .sort((a, b) => new Date(a.booking_date).getTime() - new Date(b.booking_date).getTime());
+    };
+
+    const getPastBookings = () => {
+        const now = new Date();
+        return bookings
+            .filter(b => new Date(b.booking_date) <= now || b.status === 'completed')
+            .sort((a, b) => new Date(b.booking_date).getTime() - new Date(a.booking_date).getTime());
+    };
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('fr-FR', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+
+    const getStatusBadge = (status: Booking['status']) => {
+        const badges = {
+            pending: 'bg-yellow-100 text-yellow-700',
+            confirmed: 'bg-green-100 text-green-700',
+            cancelled: 'bg-red-100 text-red-700',
+            completed: 'bg-blue-100 text-blue-700'
+        };
+        const labels = {
+            pending: 'En attente',
+            confirmed: 'Confirmé',
+            cancelled: 'Annulé',
+            completed: 'Terminé'
+        };
+        return (
+            <span className={`px-2 py-1 rounded-full text-xs font-medium ${badges[status]}`}>
+        {labels[status]}
+      </span>
+        );
+    };
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-64">
+            <div className="flex items-center justify-center h-64">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#dc5f18]"></div>
             </div>
         );
     }
 
+    const displayedBookings = activeTab === 'upcoming' ? getUpcomingBookings() : getPastBookings();
+
     return (
-        <div className="space-y-8">
-            {/* Cartes de statistiques */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatsCard
-                    title="Activités totales"
-                    value={activities.length}
-                    icon={Calendar}
-                    color="bg-[#dc5f18]"
-                />
-                <StatsCard
-                    title="À venir"
-                    value={upcoming.length}
-                    icon={TrendingUp}
-                    color="bg-blue-500"
-                />
-                <StatsCard
-                    title="Complétées"
-                    value={past.length}
-                    icon={Award}
-                    color="bg-green-500"
-                />
-                <StatsCard
-                    title="Objectifs atteints"
-                    value={objectivePercent}
-                    suffix="%"
-                    icon={Target}
-                    color="bg-purple-500"
-                />
+        <div className="space-y-6">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-[#0a1128] to-[#1a2148] rounded-xl p-6 text-white">
+                <h1 className="text-3xl font-bold mb-2">Tableau de bord</h1>
+                <p className="text-white/80">Bienvenue ! Voici un aperçu de votre activité sportive</p>
             </div>
 
-            {/* Graphiques */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Graphique : Activités par mois */}
-                <div className="bg-white rounded-xl p-6 shadow-lg">
-                    <h3 className="text-lg font-semibold text-[#0a1128] mb-4">📊 Évolution mensuelle</h3>
-                    <ResponsiveContainer width="100%" height={250}>
-                        <AreaChart data={activityByMonth}>
-                            <defs>
-                                <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#dc5f18" stopOpacity={0.8} />
-                                    <stop offset="95%" stopColor="#dc5f18" stopOpacity={0} />
-                                </linearGradient>
-                            </defs>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                            <XAxis dataKey="name" stroke="#6b7280" />
-                            <YAxis stroke="#6b7280" />
-                            <Tooltip />
-                            <Area
-                                type="monotone"
-                                dataKey="count"
-                                stroke="#dc5f18"
-                                fillOpacity={1}
-                                fill="url(#colorCount)"
-                                animationDuration={1500}
-                            />
-                        </AreaChart>
-                    </ResponsiveContainer>
+            {/* Statistiques */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Total réservations */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <Calendar className="w-6 h-6 text-blue-600" />
+                        </div>
+                        <TrendingUp className="w-5 h-5 text-green-500" />
+                    </div>
+                    <div className="text-3xl font-bold text-gray-900 mb-1">
+                        <CountUp end={stats.totalBookings} duration={2} />
+                    </div>
+                    <div className="text-sm text-gray-600">Réservations totales</div>
                 </div>
 
-                {/* Graphique : Répartition par catégorie */}
-                <div className="bg-white rounded-xl p-6 shadow-lg">
-                    <h3 className="text-lg font-semibold text-[#0a1128] mb-4">🎯 Répartition par catégorie</h3>
-                    <ResponsiveContainer width="100%" height={250}>
-                        <PieChart>
-                            <Pie
-                                data={categoryData}
-                                cx="50%"
-                                cy="50%"
-                                labelLine={false}
-                                label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                                outerRadius={80}
-                                fill="#8884d8"
-                                dataKey="value"
-                                animationDuration={1500}
-                            >
-                                {categoryData.map((_entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                ))}
-                            </Pie>
-                            <Tooltip />
-                        </PieChart>
-                    </ResponsiveContainer>
+                {/* À venir */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <Activity className="w-6 h-6 text-green-600" />
+                        </div>
+                    </div>
+                    <div className="text-3xl font-bold text-gray-900 mb-1">
+                        <CountUp end={stats.upcomingBookings} duration={2} />
+                    </div>
+                    <div className="text-sm text-gray-600">Activités à venir</div>
+                </div>
+
+                {/* Complétées */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <Activity className="w-6 h-6 text-purple-600" />
+                        </div>
+                    </div>
+                    <div className="text-3xl font-bold text-gray-900 mb-1">
+                        <CountUp end={stats.completedBookings} duration={2} />
+                    </div>
+                    <div className="text-sm text-gray-600">Activités complétées</div>
+                </div>
+
+                {/* Heures totales */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                            <Clock className="w-6 h-6 text-orange-600" />
+                        </div>
+                    </div>
+                    <div className="text-3xl font-bold text-gray-900 mb-1">
+                        <CountUp end={stats.totalHours} duration={2} />h
+                    </div>
+                    <div className="text-sm text-gray-600">Heures d'activité</div>
                 </div>
             </div>
 
-            {/* Activités à venir */}
-            <div className="bg-white rounded-xl p-6 shadow-lg">
-                <h3 className="text-lg font-semibold text-[#0a1128] mb-4">📅 Prochaines activités</h3>
-                {upcoming.length > 0 ? (
+            {/* Graphique d'activité */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-bold text-gray-900 mb-4">Activité des 7 derniers jours</h3>
+                <ResponsiveContainer width="100%" height={250}>
+                    <AreaChart data={activityData}>
+                        <defs>
+                            <linearGradient id="colorActivites" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="#dc5f18" stopOpacity={0.3}/>
+                                <stop offset="95%" stopColor="#dc5f18" stopOpacity={0}/>
+                            </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                        <XAxis dataKey="date" stroke="#9ca3af" />
+                        <YAxis stroke="#9ca3af" />
+                        <Tooltip
+                            contentStyle={{
+                                backgroundColor: 'white',
+                                border: '1px solid #e5e7eb',
+                                borderRadius: '8px',
+                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                            }}
+                        />
+                        <Area
+                            type="monotone"
+                            dataKey="activites"
+                            stroke="#dc5f18"
+                            strokeWidth={2}
+                            fill="url(#colorActivites)"
+                        />
+                    </AreaChart>
+                </ResponsiveContainer>
+            </div>
+
+            {/* Mes réservations avec onglets */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                {/* Onglets */}
+                <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-lg font-bold text-gray-900">Mes réservations</h3>
+                    <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
+                        <button
+                            onClick={() => setActiveTab('upcoming')}
+                            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                                activeTab === 'upcoming'
+                                    ? 'bg-white text-[#dc5f18] shadow-sm'
+                                    : 'text-gray-600 hover:text-gray-900'
+                            }`}
+                        >
+                            À venir ({stats.upcomingBookings})
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('past')}
+                            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                                activeTab === 'past'
+                                    ? 'bg-white text-[#dc5f18] shadow-sm'
+                                    : 'text-gray-600 hover:text-gray-900'
+                            }`}
+                        >
+                            Passées ({stats.completedBookings})
+                        </button>
+                    </div>
+                </div>
+
+                {/* Liste des réservations */}
+                {displayedBookings.length === 0 ? (
+                    <div className="text-center py-12 text-gray-500">
+                        <Calendar className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                        <p className="font-medium">Aucune réservation {activeTab === 'upcoming' ? 'à venir' : 'passée'}</p>
+                        <p className="text-sm mt-1">
+                            {activeTab === 'upcoming'
+                                ? 'Réservez une activité pour commencer !'
+                                : 'Vos activités passées apparaîtront ici'}
+                        </p>
+                    </div>
+                ) : (
                     <div className="space-y-3">
-                        {upcoming.slice(0, 5).map(activity => (
+                        {displayedBookings.map(booking => (
                             <div
-                                key={activity.id}
-                                className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-white rounded-lg hover:shadow-md transition-all cursor-pointer"
-                                onClick={() => navigate(`/activities/${activity.id}`)}
+                                key={booking.id}
+                                className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:border-[#dc5f18] hover:shadow-md transition-all"
                             >
-                                <div>
-                                    <p className="font-semibold text-[#0a1128]">{activity.name}</p>
-                                    <p className="text-sm text-gray-600">
-                                        {new Date(activity.start_time).toLocaleDateString('fr-FR', {
-                                            weekday: 'long',
-                                            day: 'numeric',
-                                            month: 'long'
-                                        })}
-                                    </p>
+                                {/* Icône */}
+                                <div className="w-12 h-12 bg-gradient-to-br from-[#dc5f18] to-[#ff7a3d] rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <Activity className="w-6 h-6 text-white" />
                                 </div>
-                                <span className="text-[#dc5f18] font-semibold">{activity.price}€</span>
+
+                                {/* Infos */}
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <h4 className="font-bold text-gray-900">{booking.activity.name}</h4>
+                                        {getStatusBadge(booking.status)}
+                                    </div>
+                                    <div className="flex items-center gap-4 text-sm text-gray-600">
+                                        <div className="flex items-center gap-1">
+                                            <Calendar className="w-4 h-4" />
+                                            <span>{formatDate(booking.booking_date)}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <Clock className="w-4 h-4" />
+                                            <span>{booking.activity.duration} min</span>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
+                                        <div className="flex items-center gap-1">
+                                            <MapPin className="w-4 h-4" />
+                                            <span>{booking.activity.company.name} - {booking.activity.company.city}</span>
+                                        </div>
+                                        {booking.activity.instructor && (
+                                            <div className="flex items-center gap-1">
+                                                <UserIcon className="w-4 h-4" />
+                                                <span>
+                          {booking.activity.instructor.first_name} {booking.activity.instructor.last_name}
+                        </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Actions */}
+                                {activeTab === 'upcoming' && booking.status === 'confirmed' && (
+                                    <button className="px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                                        Annuler
+                                    </button>
+                                )}
+                                {activeTab === 'past' && booking.status === 'completed' && (
+                                    <button className="px-4 py-2 text-sm font-medium text-[#dc5f18] hover:bg-orange-50 rounded-lg transition-colors">
+                                        Noter
+                                    </button>
+                                )}
                             </div>
                         ))}
                     </div>
-                ) : (
-                    <p className="text-gray-500 italic text-center py-8">Aucune activité à venir</p>
                 )}
             </div>
 
-            {/* Actions rapides */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <button
-                    onClick={() => navigate('/activities')}
-                    className="bg-gradient-to-r from-[#dc5f18] to-[#ff7b3d] text-white font-semibold py-4 rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all"
-                >
-                    🔍 Explorer les activités
-                </button>
-                <button
-                    onClick={() => navigate('/coaches')}
-                    className="bg-gradient-to-r from-[#0a1128] to-[#14213d] text-white font-semibold py-4 rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all"
-                >
-                    👥 Voir les coaches
-                </button>
-                <button
-                    onClick={() => navigate('/profile')}
-                    className="bg-gradient-to-r from-purple-500 to-purple-700 text-white font-semibold py-4 rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all"
-                >
-                    ⚙️ Mon profil
-                </button>
-            </div>
+            {/* Recommandations intelligentes */}
+            <RecommendationsSection />
         </div>
     );
 };
