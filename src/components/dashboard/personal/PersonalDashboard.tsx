@@ -24,7 +24,6 @@ interface Stats {
     completedBookings: number;
     totalHours: number;
 }
-
 interface PersonalDashboardProps {
     user: User;
 }
@@ -169,23 +168,7 @@ const PersonalDashboard: React.FC<PersonalDashboardProps> = ({ user }) => {
         });
     };
 
-    const getStatusBadge = (status: Booking['status']) => {
-        const badges = {
-            pending: 'bg-yellow-100 text-yellow-700',
-            confirmed: 'bg-green-100 text-green-700',
-            cancelled: 'bg-red-100 text-red-700'
-        };
-        const labels = {
-            pending: 'En attente',
-            confirmed: 'Confirmé',
-            cancelled: 'Annulé'
-        };
-        return (
-            <span className={`px-2 py-1 rounded-full text-xs font-medium ${badges[status]}`}>
-                {labels[status]}
-            </span>
-        );
-    };
+
 
     if (loading) {
         return (
@@ -380,7 +363,6 @@ const PersonalDashboard: React.FC<PersonalDashboardProps> = ({ user }) => {
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 mb-1">
                                         <h4 className="font-bold text-gray-900">{booking.activity.name}</h4>
-                                        {getStatusBadge(booking.status)}
                                     </div>
                                     <div className="flex items-center gap-4 text-sm text-gray-600">
                                         <div className="flex items-center gap-1">
