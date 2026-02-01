@@ -47,11 +47,13 @@ const AdminBackOffice: React.FC = () => {
       return setError("Mots de passe différents");
     }
     try {
-      await axiosInstance.post('/register-business/', {
+
+
+      await axiosInstance.post('/users/register-business/', {
         email: form.email,
         username: form.username,
         password: form.password,
-        preferences: {}  // ou valeurs par défaut
+        preferences: {}
       });
       setSuccess("Compte business créé !");
       // recharger la liste

@@ -44,6 +44,10 @@ import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import FaqPage from './pages/FaqPage';
 import SitemapPage from './pages/SitemapPage';
 import CookieConsentBanner from './components/CookieConsentBanner';
+import CoachDetailPage from "./pages/CoachDetailPage.tsx";
+import CompanyDetailPage from "./pages/CompanyDetailPage.tsx";
+import CompaniesPage from "./pages/CompaniesPage.tsx";
+import CoachesPage from "./pages/CoachesPage.tsx";
 
 function App() {
   return (
@@ -62,6 +66,10 @@ function App() {
               <Route path="/accept-invite" element={<AcceptInvitationPage />} />
               <Route path="/activities" element={<ActivitiesPage />} />
               <Route path="/activities/:id" element={<ActivityDetailPage />} />
+              <Route path="/coaches/:id" element={<CoachDetailPage />} />
+              <Route path="/companies/:id" element={<CompanyDetailPage />} />
+              <Route path="/companies" element={<CompaniesPage />} />
+              <Route path="/coaches" element={<CoachesPage />} />
 
               {/* B2C Authenticated */}
               <Route path="/dashboard" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />

@@ -13,11 +13,11 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({ activities, notifications }
 
   // Filtre des activités à venir et passées
   const upcoming = useMemo(
-    () => activities.filter(a => new Date(a.date) >= today),
+    () => activities.filter(a => new Date(a.start_time) >= today),
     [activities, today]
   );
   const past = useMemo(
-    () => activities.filter(a => new Date(a.date) < today),
+    () => activities.filter(a => new Date(a.start_time) < today),
     [activities, today]
   );
 
@@ -26,7 +26,7 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({ activities, notifications }
     () =>
       upcoming
         .slice()
-        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0],
+        .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())[0],
     [upcoming]
   );
 
@@ -41,7 +41,7 @@ const SummaryCards: React.FC<SummaryCardsProps> = ({ activities, notifications }
           <>
             <p className="font-semibold">{nextActivity.name}</p>
             <p className="text-sm">
-              {nextActivity.date} à {nextActivity.time}
+              {nextActivity.start_time} à {nextActivity.start_time}
             </p>
           </>
         ) : (

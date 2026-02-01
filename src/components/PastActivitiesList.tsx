@@ -12,7 +12,7 @@ const PastActivitiesList: React.FC<Props> = ({ activities }) => (
       <li key={idx} className="p-4 bg-gray-50 border rounded shadow-sm">
         <p className="font-semibold">{a.name}</p>
         <p className="text-sm text-gray-600">
-          Inscrit le {new Date(a.date).toLocaleDateString('fr-FR')}
+          Inscrit le {new Date(a.start_time).toLocaleDateString('fr-FR')}
         </p>
       </li>
     ))}

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
+import axiosInstance from "../api/axiosInstance.ts";
 
 interface Activity {
   id: number;
@@ -15,7 +16,7 @@ const AdminActivitiesPage: React.FC = () => {
 
 
   const fetchActivities = async () => {
-    const res = await axios.get('http://localhost:8000/api/activities/');
+    const res = await axios.get('/activities/');
     setActivities(res.data);
   };
 
@@ -24,23 +25,15 @@ const AdminActivitiesPage: React.FC = () => {
   }, []);
 
   const handleDelete = async (id: number) => {
-    const token = localStorage.getItem('access');
-    await axios.delete(`http://localhost:8000/api/activities/${id}/`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    await axiosInstance.delete(`/activities/${id}/`);
     fetchActivities();
   };
 
   const handleEdit = async (id: number) => {
-    const token = localStorage.getItem('access');
     const newName = edited[id];
     if (!newName) return;
 
-    await axios.put(
-      `http://localhost:8000/api/activities/${id}/`,
-      { name: newName },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    await axiosInstance.put(`/activities/${id}/`, { name: newName });
     setEdited(prev => ({ ...prev, [id]: '' }));
     fetchActivities();
   };

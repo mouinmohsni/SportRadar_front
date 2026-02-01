@@ -3,12 +3,12 @@ import axios from 'axios';
 import { refreshAccessToken } from '../utils/auth';
 
 const PUBLIC_ENDPOINTS = [
-  '/register/',
-  '/token/',
-  '/token/refresh/',
-  '/weather/',                    // API météo
-  '/places/',                     // liste des lieux labellisés
-  '/activities/', // recommandations
+  '/users/register/',           // ← Ajout du préfixe /users/
+  '/users/token/',              // ← Ajout du préfixe /users/
+  '/users/token/refresh/',      // ← Ajout du préfixe /users/
+  '/weather/',
+  '/places/',
+  '/activities/',
 ];
 
 const axiosInstance = axios.create({

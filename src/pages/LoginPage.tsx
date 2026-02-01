@@ -43,7 +43,7 @@ const LoginPage: React.FC = () => {
           setLoading(false);
           return;
         }
-        await axiosInstance.post('/register/', {
+        await axiosInstance.post('/users/register/', {
           email: formData.email,
           username: formData.name,
           password: formData.password,

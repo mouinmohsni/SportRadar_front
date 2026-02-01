@@ -20,7 +20,7 @@ const BusinessActivitiesPage: React.FC = () => {
 
   const fetchMyActivities = async () => {
     try {
-      const res = await axiosInstance.get('/my-activities/');
+      const res = await axiosInstance.get('/activities/');
       setActivities(res.data);
     } catch (err) {
       console.error('Erreur chargement activités business:', err);

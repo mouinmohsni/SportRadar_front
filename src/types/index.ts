@@ -1,6 +1,77 @@
-// File: src/types/index.ts
+// File: src/types/index.ts (VERSION MISE À JOUR)
 
-// Déclare les types Activity et Notification
+// ============================================
+// 🔧 TYPES POUR LES UTILISATEURS
+// ============================================
+
+export interface SimpleUser {
+  id: number;
+  email: string;
+  username: string;
+  first_name: string;  // ✅ AJOUTÉ
+  last_name: string;   // ✅ AJOUTÉ
+  avatar: string | null;
+  type: 'coach' | 'personal' | 'business';
+}
+
+export interface UserPreferences {
+  level: string;
+  location: string;
+  objectives: string[];
+}
+
+export interface User {
+  id: number;
+  email: string;
+  username: string;
+  first_name: string;  // ✅ AJOUTÉ
+  last_name: string;   // ✅ AJOUTÉ
+  type: 'personal' | 'coach' | 'business' | 'admin';
+  avatar: string | null;
+  is_staff: boolean;
+  is_active: boolean;  // ✅ AJOUTÉ
+  preferences: UserPreferences;
+  company?: Company;
+  created_at?: string;
+}
+
+export interface Instructor {
+  id: number;
+  email: string;
+  username: string;
+  first_name: string;  // ✅ AJOUTÉ
+  last_name: string;   // ✅ AJOUTÉ
+  type: 'coach' | 'personal' | 'business';
+  avatar: string | null;
+}
+
+// ============================================
+// 🔧 TYPES POUR LES ENTREPRISES
+// ============================================
+
+export interface Company {
+  id: number;
+  name: string;
+  description: string | null;
+  logo: string | null;
+  address: string;
+  city: string;
+  phone_number: string;
+  website: string;
+  sport_zen: boolean;
+}
+
+// ============================================
+// 🔧 TYPES POUR LES ACTIVITÉS
+// ============================================
+
+export interface ActivityRating {
+  id: number;
+  user: SimpleUser;
+  score: number;
+  comment: string;
+  created_at: string;
+}
 
 export interface Activity {
   id: number;
@@ -9,45 +80,47 @@ export interface Activity {
   category: string;
   image: string | null;
 
-  start_time: string; // C'est une chaîne de caractères au format ISO 8601
-  duration: string;   // C'est une chaîne de caractères au format HH:MM:SS
-  location_address:string;
+  start_time: string; // Format ISO 8601
+  duration: string;   // Format HH:MM:SS
+  location_address: string;
 
-  price: string; // C'est un string, pas un nombre, car c'est un DecimalField
-  level: 'all' | 'beginner' | 'intermediate' | 'advanced'; // Soyons précis
+  price: string; // String car DecimalField
+  level: 'all' | 'beginner' | 'intermediate' | 'advanced';
   venue: 'indoor' | 'outdoor';
 
   max_participants: number;
-  participants_count: number; // Votre API renvoie un nombre, pas un string
-  ratings: ActivityRating[]; // Le champ s'appelle 'ratings'
-  average_score: number | null; // Le champ s'appelle 'average_score'
-
+  participants_count: number;
+  ratings: ActivityRating[];
+  average_score: number | null;
 
   is_public: boolean;
   created_at: string;
   effective_location: string;
 
-  // --- Champs imbriqués ---
+  // Champs imbriqués
   company: Company;
-  instructor: Instructor | null; // L'instructeur peut être null
+  instructor: Instructor | null;
 }
 
-export interface SimpleUser {
-  username: string;
-  avatar: string | null;
-}
+// ============================================
+// 🔧 TYPES POUR LES RÉSERVATIONS
+// ============================================
 
-export interface ActivityRating {
+export interface Booking {
   id: number;
-  user: SimpleUser;
-  score: number; // Votre champ s'appelle 'score'
-  comment: string;
-  created_at: string;
+  user: number; // ID de l'utilisateur
+  activity: Activity; // Objet activité complet
+  status: 'confirmed' | 'cancelled' | 'pending';
+  created_at: string; // Format ISO 8601
 }
+
+// ============================================
+// 🔧 TYPES POUR LES AVIS (REVIEWS)
+// ============================================
 
 export interface Review {
   id: number;
-  user: { // On n'a besoin que du nom d'utilisateur
+  user: {
     username: string;
     avatar: string | null;
   };
@@ -56,55 +129,12 @@ export interface Review {
   created_at: string;
 }
 
+// ============================================
+// 🔧 TYPES POUR LES NOTIFICATIONS
+// ============================================
+
 export interface Notification {
   id: number;
   message: string;
   date: string;
-}
-
-// src/types/index.ts (ou un nom similaire)
-
-// Interface pour l'objet Company retourné par l'API
-export interface Company {
-  id: number;
-  name: string;
-  description: string | null;
-  logo: string | null;
-  address: string; // <-- Maintenant disponible !
-  city: string;
-  phone_number: string; // <-- Maintenant disponible !
-  website: string;
-  sport_zen: boolean;
-}
-
-// Interface pour l'objet Instructor (qui est un User) retourné par l'API
-export interface Instructor {
-  id: number;
-  email: string;
-  username: string;
-  type: 'coach' | 'personal' | 'business'; // On peut être précis sur les types possibles
-  avatar: string | null; // L'avatar peut être null
-}
-
-export interface Booking {
-  id: number;
-  user: number; // L'ID de l'utilisateur qui a réservé
-  activity: Activity; // L'objet activité complet (ou juste { id: number } si votre API ne renvoie que l'ID)
-  status: 'confirmed' | 'cancelled' | 'pending'; // Les statuts possibles
-  created_at: string; // La date de création au format ISO 8601
-}
-
-export interface UserPreferences {
-  level: string;
-  location: string;
-  objectives: string[];
-}
-export interface User {
-  id: number;
-  email: string;
-  username: string;
-  type: 'personal' | 'coach' | 'business';
-  avatar: string | null;
-  is_staff: boolean;
-  preferences: UserPreferences; // <-- Utilisez la nouvelle interface ici
 }

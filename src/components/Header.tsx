@@ -18,73 +18,227 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="bg-gradient-to-r from-[#C7C5C5] via-[#8F8C8C] to-[#736F6F] sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-        <Link to="/" onClick={() => window.scrollTo(0, 0)}>
-          <img
-            src="/images/hero/logo_sportRadar.png"
-            alt="SportRadar"
-            className="h-16"
-          />
-        </Link>
-        <nav className="flex items-center gap-6 text-white font-bold">
-          <Link to="/" onClick={() => window.scrollTo(0, 0)}>Accueil</Link>
-
-          {!isAuthenticated && (
-            <>
-              <Link to="/activities" onClick={() => window.scrollTo(0, 0)}>Activités</Link>
-              <Link
-                to="/login"
-                className="bg-[#dc5f18] px-4 py-2 rounded"
+      <header className="bg-gradient-to-r from-[#C7C5C5] via-[#8F8C8C] to-[#736F6F] sticky top-0 z-50 shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <Link to="/" onClick={() => window.scrollTo(0, 0)}>
+            <img
+                src="/images/hero/logo_sportRadar.png"
+                alt="SportRadar"
+                className="h-16"
+            />
+          </Link>
+          <nav className="flex items-center gap-6 text-white font-bold">
+            <Link
+                to="/"
                 onClick={() => window.scrollTo(0, 0)}
-              >
-                Connexion
-              </Link>
-            </>
-          )}
+                className="hover:text-[#dc5f18] transition-colors"
+            >
+              Accueil
+            </Link>
 
-          {isAuthenticated && user?.is_staff && (
-            <>
-              <Link to="/activities" onClick={() => window.scrollTo(0, 0)}>Activités</Link>
-              <Link to="/admin" onClick={() => window.scrollTo(0, 0)}>Admin</Link>
-              <button
-                onClick={handleLogout}
-                className="bg-[#dc5f18] px-4 py-2 rounded"
-              >
-                Déconnexion
-              </button>
-            </>
-          )}
+            {/* ===== UTILISATEUR NON CONNECTÉ ===== */}
+            {!isAuthenticated && (
+                <>
+                  <Link
+                      to="/activities"
+                      onClick={() => window.scrollTo(0, 0)}
+                      className="hover:text-[#dc5f18] transition-colors"
+                  >
+                    Activités
+                  </Link>
+                  <Link
+                      to="/coaches"
+                      onClick={() => window.scrollTo(0, 0)}
+                      className="hover:text-[#dc5f18] transition-colors"
+                  >
+                    Coaches
+                  </Link>
+                  <Link
+                      to="/companies"
+                      onClick={() => window.scrollTo(0, 0)}
+                      className="hover:text-[#dc5f18] transition-colors"
+                  >
+                    Salles de Sport
+                  </Link>
+                  <Link
+                      to="/login"
+                      className="bg-[#dc5f18] px-4 py-2 rounded hover:bg-[#b84f14] transition-colors"
+                      onClick={() => window.scrollTo(0, 0)}
+                  >
+                    Connexion
+                  </Link>
+                </>
+            )}
 
-          {isAuthenticated && !user?.is_staff && user?.type === 'business' && (
-            <>
-              <Link to="/business" onClick={() => window.scrollTo(0, 0)}>Espace Entreprise</Link>
-              <Link to="/activities" onClick={() => window.scrollTo(0, 0)}>Activités</Link>
-              <button
-                onClick={handleLogout}
-                className="bg-[#dc5f18] px-4 py-2 rounded"
-              >
-                Déconnexion
-              </button>
-            </>
-          )}
+            {/* ===== ADMIN ===== */}
+            {isAuthenticated && user?.is_staff && (
+                <>
+                  <Link
+                      to="/activities"
+                      onClick={() => window.scrollTo(0, 0)}
+                      className="hover:text-[#dc5f18] transition-colors"
+                  >
+                    Activités
+                  </Link>
+                  <Link
+                      to="/coaches"
+                      onClick={() => window.scrollTo(0, 0)}
+                      className="hover:text-[#dc5f18] transition-colors"
+                  >
+                    Coaches
+                  </Link>
+                  <Link
+                      to="/companies"
+                      onClick={() => window.scrollTo(0, 0)}
+                      className="hover:text-[#dc5f18] transition-colors"
+                  >
+                    Salles de Sport
+                  </Link>
+                  <Link
+                      to="/admin"
+                      onClick={() => window.scrollTo(0, 0)}
+                      className="hover:text-[#dc5f18] transition-colors"
+                  >
+                    Admin
+                  </Link>
+                  <button
+                      onClick={handleLogout}
+                      className="bg-[#dc5f18] px-4 py-2 rounded hover:bg-[#b84f14] transition-colors"
+                  >
+                    Déconnexion
+                  </button>
+                </>
+            )}
 
-          {isAuthenticated && !user?.is_staff && user?.type === 'personal' && (
-            <>
-              <Link to="/dashboard" onClick={() => window.scrollTo(0, 0)}>Dashboard</Link>
-              <Link to="/activities" onClick={() => window.scrollTo(0, 0)}>Activités</Link>
-              <Link to="/profile" onClick={() => window.scrollTo(0, 0)}>Mon profil</Link>
-              <button
-                onClick={handleLogout}
-                className="bg-[#dc5f18] px-4 py-2 rounded"
-              >
-                Déconnexion
-              </button>
-            </>
-          )}
-        </nav>
-      </div>
-    </header>
+            {/* ===== BUSINESS (Salle de Sport) ===== */}
+            {isAuthenticated && !user?.is_staff && user?.type === 'business' && (
+                <>
+                  <Link
+                      to="/business"
+                      onClick={() => window.scrollTo(0, 0)}
+                      className="hover:text-[#dc5f18] transition-colors"
+                  >
+                    Espace Entreprise
+                  </Link>
+                  <Link
+                      to="/activities"
+                      onClick={() => window.scrollTo(0, 0)}
+                      className="hover:text-[#dc5f18] transition-colors"
+                  >
+                    Activités
+                  </Link>
+                  <Link
+                      to="/coaches"
+                      onClick={() => window.scrollTo(0, 0)}
+                      className="hover:text-[#dc5f18] transition-colors"
+                  >
+                    Coaches
+                  </Link>
+                  <Link
+                      to="/companies"
+                      onClick={() => window.scrollTo(0, 0)}
+                      className="hover:text-[#dc5f18] transition-colors"
+                  >
+                    Salles de Sport
+                  </Link>
+                  <button
+                      onClick={handleLogout}
+                      className="bg-[#dc5f18] px-4 py-2 rounded hover:bg-[#b84f14] transition-colors"
+                  >
+                    Déconnexion
+                  </button>
+                </>
+            )}
+
+            {/* ===== PERSONAL (Client) ===== */}
+            {isAuthenticated && !user?.is_staff && user?.type === 'personal' && (
+                <>
+                  <Link
+                      to="/dashboard"
+                      onClick={() => window.scrollTo(0, 0)}
+                      className="hover:text-[#dc5f18] transition-colors"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                      to="/activities"
+                      onClick={() => window.scrollTo(0, 0)}
+                      className="hover:text-[#dc5f18] transition-colors"
+                  >
+                    Activités
+                  </Link>
+                  <Link
+                      to="/coaches"
+                      onClick={() => window.scrollTo(0, 0)}
+                      className="hover:text-[#dc5f18] transition-colors"
+                  >
+                    Coaches
+                  </Link>
+                  <Link
+                      to="/companies"
+                      onClick={() => window.scrollTo(0, 0)}
+                      className="hover:text-[#dc5f18] transition-colors"
+                  >
+                    Salles de Sport
+                  </Link>
+                  <Link
+                      to="/profile"
+                      onClick={() => window.scrollTo(0, 0)}
+                      className="hover:text-[#dc5f18] transition-colors"
+                  >
+                    Mon profil
+                  </Link>
+                  <button
+                      onClick={handleLogout}
+                      className="bg-[#dc5f18] px-4 py-2 rounded hover:bg-[#b84f14] transition-colors"
+                  >
+                    Déconnexion
+                  </button>
+                </>
+            )}
+
+            {/* ===== COACH ===== */}
+            {isAuthenticated && !user?.is_staff && user?.type === 'coach' && (
+                <>
+                  <Link
+                      to="/activities"
+                      onClick={() => window.scrollTo(0, 0)}
+                      className="hover:text-[#dc5f18] transition-colors"
+                  >
+                    Activités
+                  </Link>
+                  <Link
+                      to="/coaches"
+                      onClick={() => window.scrollTo(0, 0)}
+                      className="hover:text-[#dc5f18] transition-colors"
+                  >
+                    Coaches
+                  </Link>
+                  <Link
+                      to="/companies"
+                      onClick={() => window.scrollTo(0, 0)}
+                      className="hover:text-[#dc5f18] transition-colors"
+                  >
+                    Salles de Sport
+                  </Link>
+                  <Link
+                      to="/profile"
+                      onClick={() => window.scrollTo(0, 0)}
+                      className="hover:text-[#dc5f18] transition-colors"
+                  >
+                    Mon profil
+                  </Link>
+                  <button
+                      onClick={handleLogout}
+                      className="bg-[#dc5f18] px-4 py-2 rounded hover:bg-[#b84f14] transition-colors"
+                  >
+                    Déconnexion
+                  </button>
+                </>
+            )}
+          </nav>
+        </div>
+      </header>
   );
 };
 

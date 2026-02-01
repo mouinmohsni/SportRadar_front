@@ -1,7 +1,7 @@
 // src/pages/ActivityDetailPage.tsx
 
 import React, { useState, useEffect } from 'react';
-import {useNavigate, useParams} from 'react-router-dom';
+import {Link, useNavigate, useParams} from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
 import type {Activity, ActivityRating, Booking} from '../types';
 import { Helmet } from 'react-helmet-async';
@@ -186,12 +186,12 @@ const ActivityDetailPage: React.FC = () => {
     };
     const isFull = activity.participants_count >= activity.max_participants;
     const isActivityPast = new Date(activity.start_time) < new Date();
-
+    console.log(activity.ratings)
     return (
         <>
             <Helmet>
                 <title>{activity.name} - SportRadar</title>
-                <meta name="description" content={activity.description || `Détails sur l'activité ${activity.name}.`} />
+                <meta name="description" content={activity.description || `Détails sur l'activité ${activity.category}.`}  />
             </Helmet>
 
             <div className="min-h-screen bg-gray-100 py-12 px-4">
@@ -224,14 +224,28 @@ const ActivityDetailPage: React.FC = () => {
 
                                     {/* Affichage du coach */}
                                     {activity.instructor ? (
-                                        <div className="flex items-center"><UserIcon className="w-5 h-5 mr-3 text-[#dc5f18]" /><span>Coach : {activity.instructor.username}</span></div>
+                                        <div className="flex items-center">
+                                            <UserIcon className="w-5 h-5 mr-3 text-[#dc5f18]" />
+                                            <span>Coach :
+                                                <Link to={`/coaches/${activity.instructor.id}`} className="text-[#dc5f18] hover:underline ml-1">
+                                                    {activity.instructor.username}
+                                                </Link>
+                                            </span>
+                                        </div>
                                     ) : (
                                         <div className="flex items-center"><UserIcon className="w-5 h-5 mr-3 text-gray-400" /><span>Coach non assigné</span></div>
                                     )}
 
                                     {/* Affichage de la compagnie */}
                                     {activity.company && (
-                                        <div className="flex items-center"><Building className="w-5 h-5 mr-3 text-[#dc5f18]" /><span>Organisé par : {activity.company.name}</span></div>
+                                        <div className="flex items-center">
+                                            <Building className="w-5 h-5 mr-3 text-[#dc5f18]" />
+                                            <span>Organisé par :
+                                                <Link to={`/companies/${activity.company.id}`} className="text-[#dc5f18] hover:underline ml-1">
+                                                    {activity.company.name}
+                                                </Link>
+                                            </span>
+                                        </div>
                                     )}
                                 </div>
                             </div>
@@ -314,7 +328,7 @@ const ActivityDetailPage: React.FC = () => {
                                                 {/*<img src={getMediaUrl(rating.user.avatar) || avatarOptions.default} alt={rating.user.username} className="w-10 h-10 rounded-full mr-3" />*/}
                                                 {/*<img src={getMediaUrl(rating.user.avatar) || "avatarOptions.default"} alt={rating.user.username} className="w-10 h-10 rounded-full mr-3" />*/}
 
-                                                {/*<span className="font-bold">{rating.user.username}</span>*/}
+                                                {/*<span className="font-bold">{rating.user.user_name}</span>*/}
                                                 <span className="text-xs text-gray-500 ml-auto">{new Date(rating.created_at).toLocaleDateString('fr-FR')}</span>
                                             </div>
                                             {rating.score && (
