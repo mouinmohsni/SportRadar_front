@@ -9,7 +9,11 @@ import { getMediaUrl } from '../utils/media';
 import { useAuth } from '../contexts/AuthContext';
 import axios from "axios";
 import SEO from "../components/SEO.tsx";
-
+interface ReviewPayload {
+    activity: number; // ou string, selon le type de activity.id
+    comment: string;
+    score?: number; // Le '?' rend la propriété 'score' optionnelle
+}
 const ActivityDetailPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [activity, setActivity] = useState<Activity | null>(null);
@@ -78,7 +82,10 @@ const ActivityDetailPage: React.FC = () => {
         if (!activity) return;
 
         setIsReviewSubmitting(true);
-        const payload: any = {
+        const payload: ReviewPayload = {
+
+
+
             activity: activity.id,
             comment: newComment,
         };
@@ -283,7 +290,7 @@ const ActivityDetailPage: React.FC = () => {
                                         <div key={rating.id} className="p-4 border-b hover:bg-gray-50 transition-colors rounded-lg">
                                             <div className="flex items-center mb-3">
                                                 <img
-                                                    src={rating.user?.avatar ? getMediaUrl(rating.user.avatar) : 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'}
+                                                    src={getMediaUrl(rating.user?.avatar) || '/src/assets/avatars/default-avatar.png'}
                                                     alt={rating.user?.username}
                                                     className="w-12 h-12 rounded-full mr-4 border-2 border-gray-200"
                                                 />
