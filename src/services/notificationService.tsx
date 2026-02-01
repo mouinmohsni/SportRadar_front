@@ -1,11 +1,9 @@
 // File: src/services/notificationService.ts
-import axios from 'axios';
-
-const API_URL = 'http://localhost:8000/api';
+import axiosInstance from '../api/axiosInstance'; // Importez votre instance existante
 
 export interface Notification {
     id: number;
-    type: 'reminder' | 'booking' | 'assignment' | 'cancellation' | 'review' | 'report' | 'alert' | 'info';
+    type: 'reminder' | 'booking' | 'assignment' | 'cancellation' | 'resignation' | 'review' | 'report' | 'alert' | 'info';
     title: string;
     message: string;
     is_read: boolean;
@@ -25,71 +23,41 @@ class NotificationService {
     /**
      * Récupérer toutes les notifications de l'utilisateur connecté
      */
-    async getNotifications(): Promise<NotificationResponse> {
-        const token = localStorage.getItem('access_token');
-        const response = await axios.get(`${API_URL}/notifications/`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        return response.data;
+    async getNotifications(): Promise<Notification[]> {
+        // Si votre API utilise la pagination de Django Rest Framework, elle renvoie { results: [] }
+        // Sinon, elle renvoie directement le tableau [].
+        const response = await axiosInstance.get('/notifications/');
+        return response.data.results || response.data;
     }
 
     /**
      * Récupérer le nombre de notifications non lues
      */
     async getUnreadCount(): Promise<number> {
-        const token = localStorage.getItem('access_token');
-        const response = await axios.get(`${API_URL}/notifications/unread-count/`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        return response.data.count;
+        const response = await axiosInstance.get('/notifications/unread-count/');
+        // Note: Dans votre backend views.py, on a renvoyé {'unread_count': count}
+        return response.data.unread_count;
     }
 
     /**
      * Marquer une notification comme lue
      */
     async markAsRead(notificationId: number): Promise<void> {
-        const token = localStorage.getItem('access_token');
-        await axios.post(
-            `${API_URL}/notifications/${notificationId}/mark-read/`,
-            {},
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            }
-        );
+        await axiosInstance.post(`/notifications/${notificationId}/mark-read/`);
     }
 
     /**
      * Marquer toutes les notifications comme lues
      */
     async markAllAsRead(): Promise<void> {
-        const token = localStorage.getItem('access_token');
-        await axios.post(
-            `${API_URL}/notifications/mark-all-read/`,
-            {},
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            }
-        );
+        await axiosInstance.post('/notifications/mark-all-read/');
     }
 
     /**
      * Supprimer une notification
      */
     async deleteNotification(notificationId: number): Promise<void> {
-        const token = localStorage.getItem('access_token');
-        await axios.delete(`${API_URL}/notifications/${notificationId}/`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
+        await axiosInstance.delete(`/notifications/${notificationId}/`);
     }
 }
 

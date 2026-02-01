@@ -51,6 +51,7 @@ const ActivitiesPage: React.FC = () => {
       setLoading(true);
       try {
         const allActivitiesRes = await axiosInstance.get<Activity[]>('/activities/');
+        console.log("allActivitiesRes.data",allActivitiesRes.data)
         setActivities(allActivitiesRes.data);
 
         if (isAuthenticated) {

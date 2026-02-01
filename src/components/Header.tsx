@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+// import NotificationCenter from "./notifications/NotificationCenter.tsx";
 
 const Header: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
@@ -95,12 +96,20 @@ const Header: React.FC = () => {
                     Salles de Sport
                   </Link>
                   <Link
+                      to="/dashboard"
+                      onClick={() => window.scrollTo(0, 0)}
+                      className="hover:text-[#dc5f18] transition-colors"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
                       to="/admin"
                       onClick={() => window.scrollTo(0, 0)}
                       className="hover:text-[#dc5f18] transition-colors"
                   >
                     Admin
                   </Link>
+                  {/*<NotificationCenter />*/}
                   <button
                       onClick={handleLogout}
                       className="bg-[#dc5f18] px-4 py-2 rounded hover:bg-[#b84f14] transition-colors"
@@ -113,6 +122,13 @@ const Header: React.FC = () => {
             {/* ===== BUSINESS (Salle de Sport) ===== */}
             {isAuthenticated && !user?.is_staff && user?.type === 'business' && (
                 <>
+                  <Link
+                      to="/dashboard"
+                      onClick={() => window.scrollTo(0, 0)}
+                      className="hover:text-[#dc5f18] transition-colors"
+                  >
+                    Dashboard
+                  </Link>
                   <Link
                       to="/business"
                       onClick={() => window.scrollTo(0, 0)}
@@ -141,6 +157,7 @@ const Header: React.FC = () => {
                   >
                     Salles de Sport
                   </Link>
+                  {/*<NotificationCenter />*/}
                   <button
                       onClick={handleLogout}
                       className="bg-[#dc5f18] px-4 py-2 rounded hover:bg-[#b84f14] transition-colors"
@@ -188,6 +205,7 @@ const Header: React.FC = () => {
                   >
                     Mon profil
                   </Link>
+                  {/*<NotificationCenter />*/}
                   <button
                       onClick={handleLogout}
                       className="bg-[#dc5f18] px-4 py-2 rounded hover:bg-[#b84f14] transition-colors"
@@ -200,6 +218,13 @@ const Header: React.FC = () => {
             {/* ===== COACH ===== */}
             {isAuthenticated && !user?.is_staff && user?.type === 'coach' && (
                 <>
+                  <Link
+                      to="/dashboard"
+                      onClick={() => window.scrollTo(0, 0)}
+                      className="hover:text-[#dc5f18] transition-colors"
+                  >
+                    Dashboard
+                  </Link>
                   <Link
                       to="/activities"
                       onClick={() => window.scrollTo(0, 0)}
@@ -228,6 +253,7 @@ const Header: React.FC = () => {
                   >
                     Mon profil
                   </Link>
+                  {/*<NotificationCenter />*/}
                   <button
                       onClick={handleLogout}
                       className="bg-[#dc5f18] px-4 py-2 rounded hover:bg-[#b84f14] transition-colors"

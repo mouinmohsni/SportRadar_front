@@ -231,7 +231,7 @@ const NotificationCenter: React.FC = () => {
                     </div>
 
                     {/* Footer */}
-                    {notifications.length > 0 && (
+                    {notifications && notifications.length > 0 &&  (
                         <div className="p-3 border-t border-gray-200 bg-gray-50 rounded-b-xl">
                             <button
                                 onClick={() => setIsOpen(false)}

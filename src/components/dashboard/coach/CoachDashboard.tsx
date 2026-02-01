@@ -9,25 +9,53 @@ import {
     BarChart, Bar, LineChart, Line,
     XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid
 } from 'recharts';
-import type {Activity, User} from '../../../types';
+import type { Activity, User, Booking } from '../../../types';
 
 interface CoachDashboardProps {
     user: User;
 }
 
+// Type étendu avec participants_count calculé
+interface ActivityWithParticipants extends Activity {
+    participants_count: number;
+}
+
 const CoachDashboard: React.FC<CoachDashboardProps> = ({ user }) => {
     const navigate = useNavigate();
-    const [activities, setActivities] = useState<Activity[]>([]);
+    const [activities, setActivities] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                // Récupérer les activités du coach
-                const { data } = await axiosInstance.get<Activity[]>(`/users/${user.id}/activities/`);
-                setActivities(data);
-            } catch {
+                // 1. Récupérer les activités du coach
+                const activitiesResponse = await axiosInstance.get<Activity[]>(`/users/${user.id}/activities/`);
+                const activitiesData = activitiesResponse.data;
+                console.log('Coach activities:', activitiesResponse);
+
+                // 2. Récupérer tous les bookings
+                const bookingsResponse = await axiosInstance.get<Booking[]>('/bookings/');
+                const bookingsData = bookingsResponse.data;
+                console.log('All bookings:', bookingsData);
+
+                // 3. Calculer participants_count pour chaque activité
+                const activitiesWithParticipants: ActivityWithParticipants[] = activitiesData.map(activity => {
+                    // Compter les bookings confirmés pour cette activité
+                    const confirmedBookings = bookingsData.filter(
+                        booking => booking.activity.id === activity.id && booking.status === 'confirmed'
+                    );
+
+                    return {
+                        ...activity,
+                        participants_count: confirmedBookings.length
+                    };
+                });
+
+                console.log('Activities with participants:', activitiesWithParticipants);
+                setActivities(activitiesData);
+            } catch (error) {
+                console.error('Error fetching coach data:', error);
                 toast.error('Erreur lors du chargement de vos activités.');
             } finally {
                 setLoading(false);
@@ -38,15 +66,16 @@ const CoachDashboard: React.FC<CoachDashboardProps> = ({ user }) => {
 
     const today = useMemo(() => new Date(), []);
     const upcoming = useMemo(() => activities.filter(a => new Date(a.start_time) >= today), [activities, today]);
+
     const totalParticipants = useMemo(() => {
-        return activities.reduce((sum, a) => sum + (a.participants_count || 0), 0);
+        return activities.reduce((sum, a) => sum + a.participants_count, 0);
     }, [activities]);
 
     // Graphique : Participants par activité
     const participantsByActivity = useMemo(() => {
         return activities.slice(0, 5).map(a => ({
             name: a.name.length > 15 ? a.name.substring(0, 15) + '...' : a.name,
-            participants: a.participants_count || 0,
+            participants: a.participants_count,
             max: a.max_participants
         }));
     }, [activities]);
@@ -57,7 +86,7 @@ const CoachDashboard: React.FC<CoachDashboardProps> = ({ user }) => {
         const counts = Array(12).fill(0);
         activities.forEach(a => {
             const month = new Date(a.start_time).getMonth();
-            counts[month] += (a.participants_count || 0);
+            counts[month] += a.participants_count;
         });
         return months.map((name, index) => ({ name, count: counts[index] }));
     }, [activities]);

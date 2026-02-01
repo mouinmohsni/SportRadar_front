@@ -13,6 +13,7 @@ export default {
         'text-light': '#666666',    // Un gris plus clair mais toujours lisible
       }
     },
+
   },
   plugins: [],
 }

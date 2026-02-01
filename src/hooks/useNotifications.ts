@@ -17,6 +17,7 @@ export const useNotifications = () => {
             setError(null);
             const response = await notificationService.getNotifications();
             setNotifications(response.results);
+            console.log("response===",response)
         } catch (err: any) {
             setError(err.message || 'Erreur lors du chargement des notifications');
             console.error('Error fetching notifications:', err);

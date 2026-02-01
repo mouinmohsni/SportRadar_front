@@ -22,9 +22,18 @@ const allObjectives = [
 ];
 
 const PersonalPreferences: React.FC<PersonalPreferencesProps> = ({ user, onUpdate }) => {
-    const [preferences, setPreferences] = useState<UserPreferences>(
-        user.preferences || { location: '', level: '', objectives: [] }
-    );
+    // Initialisation robuste : on s'assure que objectives est TOUJOURS un tableau
+    const [preferences, setPreferences] = useState<UserPreferences>(() => {
+        const defaultPrefs = { location: '', level: '', objectives: [] };
+        if (!user.preferences) return defaultPrefs;
+
+        return {
+            ...defaultPrefs,
+            ...user.preferences,
+            objectives: Array.isArray(user.preferences.objectives) ? user.preferences.objectives : []
+        };
+    });
+
     const [saving, setSaving] = useState(false);
     const [status, setStatus] = useState('');
 
@@ -35,12 +44,20 @@ const PersonalPreferences: React.FC<PersonalPreferencesProps> = ({ user, onUpdat
 
     const handleObjectiveChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { value, checked } = e.target;
-        setPreferences(prev => ({
-            ...prev,
-            objectives: checked
-                ? [...prev.objectives, value]
-                : prev.objectives.filter(o => o !== value)
-        }));
+
+        setPreferences(prev => {
+            // Sécurité : on s'assure que prev.objectives est bien un tableau avant de le manipuler
+            const currentObjectives = Array.isArray(prev?.objectives) ? prev.objectives : [];
+
+            const newObjectives = checked
+                ? [...currentObjectives, value]
+                : currentObjectives.filter(o => o !== value);
+
+            return {
+                ...prev,
+                objectives: newObjectives
+            };
+        });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -77,7 +94,7 @@ const PersonalPreferences: React.FC<PersonalPreferencesProps> = ({ user, onUpdat
                     <label className="block mb-1 font-medium text-gray-700">Localisation préférée</label>
                     <select
                         name="location"
-                        value={preferences.location}
+                        value={preferences?.location || ''}
                         onChange={handleChange}
                         className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#dc5f18]"
                         disabled={saving}
@@ -94,7 +111,7 @@ const PersonalPreferences: React.FC<PersonalPreferencesProps> = ({ user, onUpdat
                     <label className="block mb-1 font-medium text-gray-700">Niveau sportif</label>
                     <select
                         name="level"
-                        value={preferences.level}
+                        value={preferences?.level || ''}
                         onChange={handleChange}
                         className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#dc5f18]"
                         disabled={saving}
@@ -115,7 +132,8 @@ const PersonalPreferences: React.FC<PersonalPreferencesProps> = ({ user, onUpdat
                                 <input
                                     type="checkbox"
                                     value={obj}
-                                    checked={preferences.objectives.includes(obj)}
+                                    // Utilisation de l'optional chaining et repli sur tableau vide pour éviter le crash
+                                    checked={preferences?.objectives?.includes(obj) || false}
                                     onChange={handleObjectiveChange}
                                     className="mr-2 w-4 h-4 text-[#dc5f18] focus:ring-[#dc5f18]"
                                     disabled={saving}

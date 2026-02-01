@@ -1,45 +1,9 @@
 // File: src/components/dashboard/personal/RecommendationsSection.tsx
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Sparkles, MapPin, Target, Star, Users, Clock } from 'lucide-react';
-import axios from 'axios';
-
-interface Activity {
-    id: number;
-    name: string;
-    description: string;
-    category: string;
-    difficulty_level: 'beginner' | 'intermediate' | 'advanced' | 'all';
-    duration: number;
-    max_participants: number;
-    current_participants: number;
-    price: number;
-    image?: string;
-    company: {
-        id: number;
-        name: string;
-        address: string;
-        city: string;
-    };
-    instructor?: {
-        id: number;
-        first_name: string;
-        last_name: string;
-    };
-    average_rating?: number;
-    total_ratings?: number;
-}
-
-interface User {
-    id: number;
-    username: string;
-    first_name: string;
-    last_name: string;
-    city?: string;
-    address?: string;
-    fitness_goals?: string[];
-    fitness_level?: 'beginner' | 'intermediate' | 'advanced';
-    preferred_categories?: string[];
-}
+import axiosInstance from '../../../api/axiosInstance';
+import type { Activity, User } from '../../../types';
 
 interface RecommendationScore {
     activity: Activity;
@@ -59,23 +23,18 @@ const RecommendationsSection: React.FC = () => {
     const fetchUserAndRecommendations = async () => {
         try {
             setLoading(true);
-            const token = localStorage.getItem('access_token');
 
             // Récupérer les infos utilisateur
-            const userResponse = await axios.get('http://localhost:8000/api/users/me/', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const userResponse = await axiosInstance.get('/users/me/');
             const userData = userResponse.data;
             setUser(userData);
 
             // Récupérer toutes les activités
-            const activitiesResponse = await axios.get('http://localhost:8000/api/activities/', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const activitiesResponse = await axiosInstance.get('/activities/');
             const activities = activitiesResponse.data.results || activitiesResponse.data;
 
             // Calculer les scores de recommandation
-            const scored = calculateRecommendationScores(activities, userData);
+            const scored = calculateRecommendationScores(activities, user || userData);
 
             // Trier par score décroissant et prendre les 6 meilleures
             const topRecommendations = scored
@@ -96,51 +55,51 @@ const RecommendationsSection: React.FC = () => {
             const reasons: string[] = [];
 
             // 1. OBJECTIFS FITNESS (30% du score)
-            if (user.fitness_goals && user.fitness_goals.length > 0) {
-                const goalScore = calculateGoalScore(activity.category, user.fitness_goals);
+            if (user.preferences?.objectives && user.preferences.objectives.length > 0) {
+                const goalScore = calculateGoalScore(activity.category, user.preferences.objectives);
                 score += goalScore * 30;
                 if (goalScore > 0.7) {
-                    reasons.push(`Parfait pour ${user.fitness_goals[0]}`);
+                    reasons.push(`Parfait pour ${user.preferences.objectives[0]}`);
                 }
             }
 
             // 2. LOCALISATION (40% du score)
-            if (user.city && activity.company.city) {
-                const locationScore = calculateLocationScore(user.city, activity.company.city);
+            if (user.preferences?.location && activity.company.city) {
+                const locationScore = calculateLocationScore(user.preferences.location, activity.company.city);
                 score += locationScore * 40;
                 if (locationScore === 1) {
-                    reasons.push(`Dans votre ville (${user.city})`);
+                    reasons.push(`Dans votre ville (${user.preferences.location})`);
                 } else if (locationScore > 0.5) {
                     reasons.push('Proche de vous');
                 }
             }
 
             // 3. NIVEAU (20% du score)
-            if (user.fitness_level) {
-                const levelScore = calculateLevelScore(activity.difficulty_level, user.fitness_level);
+            if (user.preferences?.level) {
+                const levelScore = calculateLevelScore(activity.level, user.preferences.level);
                 score += levelScore * 20;
                 if (levelScore === 1) {
-                    reasons.push(`Adapté à votre niveau (${translateLevel(user.fitness_level)})`);
+                    reasons.push(`Adapté à votre niveau (${translateLevel(user.preferences.level)})`);
                 }
             }
 
             // 4. NOTES (10% du score)
-            if (activity.average_rating) {
-                const ratingScore = activity.average_rating / 5;
+            if (activity.average_score) {
+                const ratingScore = activity.average_score / 5;
                 score += ratingScore * 10;
-                if (activity.average_rating >= 4.5) {
-                    reasons.push(`Excellentes notes (${activity.average_rating.toFixed(1)}/5)`);
+                if (activity.average_score >= 4.5) {
+                    reasons.push(`Excellentes notes (${activity.average_score.toFixed(1)}/5)`);
                 }
             }
 
             // Bonus : Places disponibles
-            const availableSpots = activity.max_participants - activity.current_participants;
+            const availableSpots = activity.max_participants - activity.participants_count;
             if (availableSpots > 0 && availableSpots <= 3) {
                 reasons.push(`Plus que ${availableSpots} place${availableSpots > 1 ? 's' : ''} !`);
             }
 
             // Bonus : Catégories préférées
-            if (user.preferred_categories && user.preferred_categories.includes(activity.category)) {
+            if (user.preferences?.objectives && user.preferences.objectives.includes(activity.category)) {
                 score += 5;
                 reasons.push('Catégorie favorite');
             }
@@ -156,11 +115,12 @@ const RecommendationsSection: React.FC = () => {
     const calculateGoalScore = (category: string, goals: string[]): number => {
         const goalMapping: { [key: string]: string[] } = {
             'perte de poids': ['cardio', 'hiit', 'running', 'cycling', 'zumba', 'aerobic'],
-            'gain musculaire': ['musculation', 'crossfit', 'bodybuilding', 'strength'],
-            'endurance': ['running', 'cycling', 'swimming', 'cardio', 'triathlon'],
-            'flexibilité': ['yoga', 'pilates', 'stretching', 'dance'],
-            'bien-être': ['yoga', 'meditation', 'pilates', 'tai chi'],
-            'performance': ['crossfit', 'hiit', 'functional training', 'athletic'],
+            'renforcement musculaire': ['musculation', 'crossfit', 'bodybuilding', 'strength', 'fitness'],
+            'réduction du stress': ['yoga', 'meditation', 'pilates', 'tai chi', 'stretching'],
+            'amélioration de la flexibilité': ['yoga', 'fitness', 'pilates', 'stretching', 'dance'],
+            'endurance cardio': ['running', 'cycling', 'swimming', 'cardio', 'triathlon'],
+            'bien-être général': ['yoga', 'fitness', 'meditation', 'pilates', 'tai chi'],
+            'socialisation': ['dance', 'zumba', 'group fitness', 'team sports', 'crossfit']
         };
 
         let maxScore = 0;
@@ -194,18 +154,18 @@ const RecommendationsSection: React.FC = () => {
     };
 
     const calculateLevelScore = (
-        activityLevel: Activity['difficulty_level'],
-        userLevel: User['fitness_level']
+        activityLevel: Activity['level'],
+        userLevel: string
     ): number => {
         if (activityLevel === 'all') return 1;
 
-        const levelHierarchy = {
+        const levelHierarchy: { [key: string]: number } = {
             'beginner': 1,
             'intermediate': 2,
             'advanced': 3
         };
 
-        const userLevelNum = levelHierarchy[userLevel || 'beginner'];
+        const userLevelNum = levelHierarchy[userLevel.toLowerCase()] || 1;
         const activityLevelNum = levelHierarchy[activityLevel];
 
         if (userLevelNum === activityLevelNum) return 1;
@@ -220,10 +180,10 @@ const RecommendationsSection: React.FC = () => {
             'advanced': 'Avancé',
             'all': 'Tous niveaux'
         };
-        return translations[level] || level;
+        return translations[level.toLowerCase()] || level;
     };
 
-    const getDifficultyColor = (level: Activity['difficulty_level']): string => {
+    const getDifficultyColor = (level: Activity['level']): string => {
         const colors = {
             'beginner': 'bg-green-100 text-green-700',
             'intermediate': 'bg-yellow-100 text-yellow-700',
@@ -266,13 +226,15 @@ const RecommendationsSection: React.FC = () => {
                 <div className="text-center py-8 text-gray-500">
                     <Sparkles className="w-12 h-12 mx-auto mb-3 text-gray-300" />
                     <p>Aucune recommandation disponible pour le moment</p>
+                    <p className="text-sm mt-2">Complétez votre profil pour obtenir des recommandations personnalisées</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {recommendations.map(({ activity, score, reasons }) => (
-                        <div
+                        <Link
                             key={activity.id}
-                            className="group relative bg-gradient-to-br from-gray-50 to-white rounded-lg border border-gray-200 hover:border-[#dc5f18] hover:shadow-lg transition-all duration-300 overflow-hidden"
+                            to={`/activities/${activity.id}`}
+                            className="group relative bg-gradient-to-br from-gray-50 to-white rounded-lg border border-gray-200 hover:border-[#dc5f18] hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer"
                         >
                             {/* Badge de score */}
                             <div className="absolute top-3 right-3 z-10">
@@ -300,12 +262,12 @@ const RecommendationsSection: React.FC = () => {
                             <div className="p-4">
                                 {/* Titre et catégorie */}
                                 <div className="mb-3">
-                                    <h4 className="font-bold text-gray-900 mb-1 line-clamp-1">
+                                    <h4 className="font-bold text-gray-900 mb-1 line-clamp-1 group-hover:text-[#dc5f18] transition-colors">
                                         {activity.name}
                                     </h4>
-                                    <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(activity.difficulty_level)}`}>
-                    {translateLevel(activity.difficulty_level)}
-                  </span>
+                                    <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(activity.level)}`}>
+                                        {translateLevel(activity.level)}
+                                    </span>
                                 </div>
 
                                 {/* Raisons de recommandation */}
@@ -322,16 +284,16 @@ const RecommendationsSection: React.FC = () => {
                                 <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
                                     <div className="flex items-center gap-1">
                                         <Clock className="w-3 h-3" />
-                                        <span>{activity.duration} min</span>
+                                        <span>{activity.duration}</span>
                                     </div>
                                     <div className="flex items-center gap-1">
                                         <Users className="w-3 h-3" />
-                                        <span>{activity.current_participants}/{activity.max_participants}</span>
+                                        <span>{activity.participants_count}/{activity.max_participants}</span>
                                     </div>
-                                    {activity.average_rating && (
+                                    {activity.average_score && (
                                         <div className="flex items-center gap-1">
                                             <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                                            <span>{activity.average_rating.toFixed(1)}</span>
+                                            <span>{activity.average_score.toFixed(1)}</span>
                                         </div>
                                     )}
                                 </div>
@@ -347,12 +309,12 @@ const RecommendationsSection: React.FC = () => {
                                     <div className="text-lg font-bold text-[#dc5f18]">
                                         {activity.price}€
                                     </div>
-                                    <button className="px-4 py-2 bg-gradient-to-r from-[#dc5f18] to-[#ff7a3d] text-white text-sm font-medium rounded-lg hover:shadow-lg transition-all">
-                                        Réserver
-                                    </button>
+                                    <div className="px-4 py-2 bg-gradient-to-r from-[#dc5f18] to-[#ff7a3d] text-white text-sm font-medium rounded-lg group-hover:shadow-lg transition-all">
+                                        Voir détails
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </Link>
                     ))}
                 </div>
             )}

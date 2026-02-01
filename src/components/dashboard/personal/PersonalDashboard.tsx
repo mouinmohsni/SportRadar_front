@@ -1,30 +1,22 @@
 // File: src/components/dashboard/personal/PersonalDashboard.tsx
 import React, { useState, useEffect } from 'react';
-import { Calendar, TrendingUp, Activity, Clock, MapPin, User as UserIcon } from 'lucide-react';
-import {  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Calendar, TrendingUp, Activity as ActivityIcon, Clock, MapPin, User as UserIcon } from 'lucide-react';
+import {
+    AreaChart,
+    Area,
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer
+} from 'recharts';
 import CountUp from 'react-countup';
-import axios from 'axios';
-import RecommendationsSection from './RecommendationsSection';
-
-interface Booking {
-    id: number;
-    activity: {
-        id: number;
-        name: string;
-        category: string;
-        duration: number;
-        company: {
-            name: string;
-            city: string;
-        };
-        instructor?: {
-            first_name: string;
-            last_name: string;
-        };
-    };
-    booking_date: string;
-    status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
-}
+import axiosInstance from '../../../api/axiosInstance';
+import type { Booking, User } from '../../../types';
+import { Link } from "react-router-dom";
+import RecommendationsSection from "./RecommendationsSection.tsx";
 
 interface Stats {
     totalBookings: number;
@@ -33,7 +25,11 @@ interface Stats {
     totalHours: number;
 }
 
-const PersonalDashboard: React.FC = () => {
+interface PersonalDashboardProps {
+    user: User;
+}
+
+const PersonalDashboard: React.FC<PersonalDashboardProps> = ({ user }) => {
     const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [stats, setStats] = useState<Stats>({
@@ -44,6 +40,7 @@ const PersonalDashboard: React.FC = () => {
     });
     const [loading, setLoading] = useState(true);
     const [activityData, setActivityData] = useState<any[]>([]);
+    const [monthlyDurationData, setMonthlyDurationData] = useState<any[]>([]);
 
     useEffect(() => {
         fetchDashboardData();
@@ -52,36 +49,40 @@ const PersonalDashboard: React.FC = () => {
     const fetchDashboardData = async () => {
         try {
             setLoading(true);
-            const token = localStorage.getItem('access_token');
 
             // Récupérer les réservations
-            const bookingsResponse = await axios.get('http://localhost:8000/api/bookings/', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const bookingsData = bookingsResponse.data.results || bookingsResponse.data;
+            const bookingsResponse = await axiosInstance.get<Booking[]>('/bookings/');
+            const bookingsData = bookingsResponse.data;
+            console.log('Bookings data:', bookingsData);
             setBookings(bookingsData);
 
             // Calculer les statistiques
             const now = new Date();
             const upcoming = bookingsData.filter((b: Booking) =>
-                new Date(b.booking_date) > now && b.status !== 'cancelled'
+                new Date(b.activity.start_time) > now && b.status !== 'cancelled'
             );
             const completed = bookingsData.filter((b: Booking) =>
-                b.status === 'completed' || (new Date(b.booking_date) < now && b.status === 'confirmed')
+                b.status === 'completed' || (new Date(b.activity.start_time) < now && b.status === 'confirmed')
             );
-            const totalHours = bookingsData.reduce((sum: number, b: Booking) =>
-                sum + (b.activity.duration / 60), 0
-            );
+
+            // Calculer les heures totales (duration est en format "HH:MM:SS")
+            const totalMinutes = bookingsData.reduce((sum: number, b: Booking) => {
+                const duration = b.activity.duration;
+                const [hours, minutes] = duration.split(':').map(Number);
+                return sum + (hours * 60 + minutes);
+            }, 0);
+            const totalHours = Math.round(totalMinutes / 60);
 
             setStats({
                 totalBookings: bookingsData.length,
                 upcomingBookings: upcoming.length,
                 completedBookings: completed.length,
-                totalHours: Math.round(totalHours)
+                totalHours
             });
 
-            // Générer les données pour le graphique (activité des 7 derniers jours)
+            // Générer les données pour les graphiques
             generateActivityData(bookingsData);
+            generateMonthlyDurationData(bookingsData);
         } catch (error) {
             console.error('Error fetching dashboard data:', error);
         } finally {
@@ -98,32 +99,63 @@ const PersonalDashboard: React.FC = () => {
 
         const data = last7Days.map(date => {
             const dayBookings = bookings.filter((b: Booking) => {
-                const bookingDate = new Date(b.booking_date);
-                return bookingDate.toDateString() === date.toDateString();
+                const activityDate = new Date(b.activity.start_time);
+                return activityDate.toDateString() === date.toDateString();
             });
 
             return {
-                date: date.toLocaleDateString('fr-FR', { weekday: 'short' }),
-                activites: dayBookings.length,
-                heures: dayBookings.reduce((sum, b) => sum + (b.activity.duration / 60), 0)
+                date: date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }),
+                activites: dayBookings.length
             };
         });
 
         setActivityData(data);
     };
 
+    const generateMonthlyDurationData = (bookings: Booking[]) => {
+        const last6Months = Array.from({ length: 6 }, (_, i) => {
+            const date = new Date();
+            date.setMonth(date.getMonth() - (5 - i));
+            return date;
+        });
+
+        const data = last6Months.map(date => {
+            const monthBookings = bookings.filter((b: Booking) => {
+                const activityDate = new Date(b.activity.start_time);
+                return (
+                    activityDate.getMonth() === date.getMonth() &&
+                    activityDate.getFullYear() === date.getFullYear()
+                );
+            });
+
+            // Calculer les heures pour ce mois
+            const monthMinutes = monthBookings.reduce((sum, b) => {
+                const duration = b.activity.duration;
+                const [hours, minutes] = duration.split(':').map(Number);
+                return sum + (hours * 60 + minutes);
+            }, 0);
+
+            return {
+                mois: date.toLocaleDateString('fr-FR', { month: 'short' }),
+                heures: Math.round(monthMinutes / 60 * 10) / 10 // Arrondi à 1 décimale
+            };
+        });
+
+        setMonthlyDurationData(data);
+    };
+
     const getUpcomingBookings = () => {
         const now = new Date();
         return bookings
-            .filter(b => new Date(b.booking_date) > now && b.status !== 'cancelled')
-            .sort((a, b) => new Date(a.booking_date).getTime() - new Date(b.booking_date).getTime());
+            .filter(b => new Date(b.activity.start_time) > now && b.status !== 'cancelled')
+            .sort((a, b) => new Date(a.activity.start_time).getTime() - new Date(b.activity.start_time).getTime());
     };
 
     const getPastBookings = () => {
         const now = new Date();
         return bookings
-            .filter(b => new Date(b.booking_date) <= now || b.status === 'completed')
-            .sort((a, b) => new Date(b.booking_date).getTime() - new Date(a.booking_date).getTime());
+            .filter(b => new Date(b.activity.start_time) <= now || b.status === 'completed')
+            .sort((a, b) => new Date(b.activity.start_time).getTime() - new Date(a.activity.start_time).getTime());
     };
 
     const formatDate = (dateString: string) => {
@@ -142,19 +174,17 @@ const PersonalDashboard: React.FC = () => {
         const badges = {
             pending: 'bg-yellow-100 text-yellow-700',
             confirmed: 'bg-green-100 text-green-700',
-            cancelled: 'bg-red-100 text-red-700',
-            completed: 'bg-blue-100 text-blue-700'
+            cancelled: 'bg-red-100 text-red-700'
         };
         const labels = {
             pending: 'En attente',
             confirmed: 'Confirmé',
-            cancelled: 'Annulé',
-            completed: 'Terminé'
+            cancelled: 'Annulé'
         };
         return (
             <span className={`px-2 py-1 rounded-full text-xs font-medium ${badges[status]}`}>
-        {labels[status]}
-      </span>
+                {labels[status]}
+            </span>
         );
     };
 
@@ -173,7 +203,7 @@ const PersonalDashboard: React.FC = () => {
             {/* Header */}
             <div className="bg-gradient-to-r from-[#0a1128] to-[#1a2148] rounded-xl p-6 text-white">
                 <h1 className="text-3xl font-bold mb-2">Tableau de bord</h1>
-                <p className="text-white/80">Bienvenue ! Voici un aperçu de votre activité sportive</p>
+                <p className="text-white/80">Bienvenue {user.first_name} ! Voici un aperçu de votre activité sportive</p>
             </div>
 
             {/* Statistiques */}
@@ -196,7 +226,7 @@ const PersonalDashboard: React.FC = () => {
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-shadow">
                     <div className="flex items-center justify-between mb-4">
                         <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                            <Activity className="w-6 h-6 text-green-600" />
+                            <ActivityIcon className="w-6 h-6 text-green-600" />
                         </div>
                     </div>
                     <div className="text-3xl font-bold text-gray-900 mb-1">
@@ -209,7 +239,7 @@ const PersonalDashboard: React.FC = () => {
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-shadow">
                     <div className="flex items-center justify-between mb-4">
                         <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                            <Activity className="w-6 h-6 text-purple-600" />
+                            <ActivityIcon className="w-6 h-6 text-purple-600" />
                         </div>
                     </div>
                     <div className="text-3xl font-bold text-gray-900 mb-1">
@@ -232,42 +262,72 @@ const PersonalDashboard: React.FC = () => {
                 </div>
             </div>
 
-            {/* Graphique d'activité */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Activité des 7 derniers jours</h3>
-                <ResponsiveContainer width="100%" height={250}>
-                    <AreaChart data={activityData}>
-                        <defs>
-                            <linearGradient id="colorActivites" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#dc5f18" stopOpacity={0.3}/>
-                                <stop offset="95%" stopColor="#dc5f18" stopOpacity={0}/>
-                            </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                        <XAxis dataKey="date" stroke="#9ca3af" />
-                        <YAxis stroke="#9ca3af" />
-                        <Tooltip
-                            contentStyle={{
-                                backgroundColor: 'white',
-                                border: '1px solid #e5e7eb',
-                                borderRadius: '8px',
-                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                            }}
-                        />
-                        <Area
-                            type="monotone"
-                            dataKey="activites"
-                            stroke="#dc5f18"
-                            strokeWidth={2}
-                            fill="url(#colorActivites)"
-                        />
-                    </AreaChart>
-                </ResponsiveContainer>
-            </div>
+            {/* Graphiques côte à côte */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* Graphique 1 : Activités des 7 derniers jours */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h3 className="text-lg font-bold text-gray-900 mb-4">📊 Activités des 7 derniers jours</h3>
+                    <ResponsiveContainer width="100%" height={250}>
+                        <AreaChart data={activityData}>
+                            <defs>
+                                <linearGradient id="colorActivites" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#dc5f18" stopOpacity={0.3}/>
+                                    <stop offset="95%" stopColor="#dc5f18" stopOpacity={0}/>
+                                </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                            <XAxis dataKey="date" stroke="#9ca3af" style={{ fontSize: '12px' }} />
+                            <YAxis stroke="#9ca3af" style={{ fontSize: '12px' }} />
+                            <Tooltip
+                                contentStyle={{
+                                    backgroundColor: 'white',
+                                    border: '1px solid #e5e7eb',
+                                    borderRadius: '8px',
+                                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                                }}
+                            />
+                            <Area
+                                type="monotone"
+                                dataKey="activites"
+                                stroke="#dc5f18"
+                                strokeWidth={2}
+                                fill="url(#colorActivites)"
+                                name="Activités"
+                            />
+                        </AreaChart>
+                    </ResponsiveContainer>
+                </div>
 
+                {/* Graphique 2 : Durée par mois (6 derniers mois) */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h3 className="text-lg font-bold text-gray-900 mb-4">⏱️ Durée par mois (6 derniers mois)</h3>
+                    <ResponsiveContainer width="100%" height={250}>
+                        <BarChart data={monthlyDurationData}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                            <XAxis dataKey="mois" stroke="#9ca3af" style={{ fontSize: '12px' }} />
+                            <YAxis stroke="#9ca3af" style={{ fontSize: '12px' }} />
+                            <Tooltip
+                                contentStyle={{
+                                    backgroundColor: 'white',
+                                    border: '1px solid #e5e7eb',
+                                    borderRadius: '8px',
+                                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                                }}
+                                formatter={(value: number) => [`${value}h`, 'Durée']}
+                            />
+                            <Bar
+                                dataKey="heures"
+                                fill="#0a1128"
+                                radius={[8, 8, 0, 0]}
+                                name="Heures"
+                            />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+            </div>
+            <RecommendationsSection />
             {/* Mes réservations avec onglets */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                {/* Onglets */}
                 <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg font-bold text-gray-900">Mes réservations</h3>
                     <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
@@ -314,7 +374,7 @@ const PersonalDashboard: React.FC = () => {
                             >
                                 {/* Icône */}
                                 <div className="w-12 h-12 bg-gradient-to-br from-[#dc5f18] to-[#ff7a3d] rounded-lg flex items-center justify-center flex-shrink-0">
-                                    <Activity className="w-6 h-6 text-white" />
+                                    <ActivityIcon className="w-6 h-6 text-white" />
                                 </div>
 
                                 {/* Infos */}
@@ -326,11 +386,11 @@ const PersonalDashboard: React.FC = () => {
                                     <div className="flex items-center gap-4 text-sm text-gray-600">
                                         <div className="flex items-center gap-1">
                                             <Calendar className="w-4 h-4" />
-                                            <span>{formatDate(booking.booking_date)}</span>
+                                            <span>{formatDate(booking.activity.start_time)}</span>
                                         </div>
                                         <div className="flex items-center gap-1">
                                             <Clock className="w-4 h-4" />
-                                            <span>{booking.activity.duration} min</span>
+                                            <span>{booking.activity.duration}</span>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
@@ -342,8 +402,8 @@ const PersonalDashboard: React.FC = () => {
                                             <div className="flex items-center gap-1">
                                                 <UserIcon className="w-4 h-4" />
                                                 <span>
-                          {booking.activity.instructor.first_name} {booking.activity.instructor.last_name}
-                        </span>
+                                                    {booking.activity.instructor.first_name} {booking.activity.instructor.last_name}
+                                                </span>
                                             </div>
                                         )}
                                     </div>
@@ -351,23 +411,24 @@ const PersonalDashboard: React.FC = () => {
 
                                 {/* Actions */}
                                 {activeTab === 'upcoming' && booking.status === 'confirmed' && (
-                                    <button className="px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                                        Annuler
-                                    </button>
+                                    <Link to={`/activities/${booking.activity.id}`} className="hover:text-[#dc5f18] transition-colors">
+                                        <p className="px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                                            Annuler
+                                        </p>
+                                    </Link>
                                 )}
-                                {activeTab === 'past' && booking.status === 'completed' && (
-                                    <button className="px-4 py-2 text-sm font-medium text-[#dc5f18] hover:bg-orange-50 rounded-lg transition-colors">
-                                        Noter
-                                    </button>
+                                {activeTab === 'past' && booking.status === 'confirmed' && (
+                                    <Link to={`/activities/${booking.activity.id}`} className="hover:text-[#dc5f18] transition-colors">
+                                        <p className="px-4 py-2 text-sm font-medium text-[#dc5f18] hover:bg-orange-50 rounded-lg transition-colors">
+                                            Noter
+                                        </p>
+                                    </Link>
                                 )}
                             </div>
                         ))}
                     </div>
                 )}
             </div>
-
-            {/* Recommandations intelligentes */}
-            <RecommendationsSection />
         </div>
     );
 };
