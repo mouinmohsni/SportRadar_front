@@ -22,7 +22,7 @@ const CompaniesPage: React.FC = () => {
         const fetchCompanies = async () => {
             setLoading(true);
             try {
-                const response = await axiosInstance.get<Company[]>('/companies/');
+                const response = await axiosInstance.get<Company[]>('/api/companies/');
                 setCompanies(response.data);
 
             } catch (error) {

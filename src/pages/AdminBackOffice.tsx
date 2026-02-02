@@ -28,7 +28,7 @@ const AdminBackOffice: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const res = await axiosInstance.get('/users/'); // ou un endpoint admin pour lister users
+        const res = await axiosInstance.get('/api/users/'); // ou un endpoint admin pour lister users
         setBusinessList(res.data.filter((u:any)=>u.type==='business'));
       } catch {
         // ignorer
@@ -49,7 +49,7 @@ const AdminBackOffice: React.FC = () => {
     try {
 
 
-      await axiosInstance.post('/users/register-business/', {
+      await axiosInstance.post('/api/users/register-business/', {
         email: form.email,
         username: form.username,
         password: form.password,

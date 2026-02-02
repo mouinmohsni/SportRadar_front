@@ -43,9 +43,9 @@ const CompanyDetailPage: React.FC = () => {
 
         // ✅ Faire 3 appels API en parallèle
         Promise.all([
-            axiosInstance.get<Company>(`/companies/${id}/`),
-            axiosInstance.get<User[]>(`/companies/${id}/coaches/`),
-            axiosInstance.get<Activity[]>(`/companies/${id}/activities/`)
+            axiosInstance.get<Company>(`/api/companies/${id}/`),
+            axiosInstance.get<User[]>(`/api/companies/${id}/coaches/`),
+            axiosInstance.get<Activity[]>(`/api/companies/${id}/activities/`)
         ])
             .then(([companyResponse, coachesResponse, activitiesResponse]) => {
                 setCompany(companyResponse.data);

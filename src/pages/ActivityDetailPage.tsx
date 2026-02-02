@@ -40,8 +40,8 @@ const ActivityDetailPage: React.FC = () => {
             setLoading(true);
             try {
                 const [activityRes, bookingsRes] = await Promise.all([
-                    axiosInstance.get<Activity>(`/activities/${id}/`),
-                    isAuthenticated ? axiosInstance.get<Booking[]>('/bookings/') : Promise.resolve({ data: [] as Booking[] })
+                    axiosInstance.get<Activity>(`/api/activities/${id}/`),
+                    isAuthenticated ? axiosInstance.get<Booking[]>('/api/bookings/') : Promise.resolve({ data: [] as Booking[] })
                 ]);
 
                 setActivity(activityRes.data);
@@ -95,7 +95,7 @@ const ActivityDetailPage: React.FC = () => {
         }
         try {
             const { data: newRatingData } = await axiosInstance.post<ActivityRating>(
-                `/activities/${activity.id}/ratings/`,
+                `/api/activities/${activity.id}/ratings/`,
                 payload
             );
 
@@ -135,15 +135,15 @@ const ActivityDetailPage: React.FC = () => {
         setIsSubmitting(true);
         try {
             if (isRegistered) {
-                const bookings = (await axiosInstance.get<Booking[]>('/bookings/')).data;
+                const bookings = (await axiosInstance.get<Booking[]>('/api/bookings/')).data;
                 const bookingToDelete = bookings.find(b => b.activity.id === activity.id);
                 if (bookingToDelete) {
-                    await axiosInstance.delete(`/bookings/${bookingToDelete.id}/`);
+                    await axiosInstance.delete(`/api/bookings/${bookingToDelete.id}/`);
                     setIsRegistered(false);
                     setActivity(prev => prev ? { ...prev, participants_count: prev.participants_count - 1 } : null);
                 }
             } else {
-                await axiosInstance.post('/bookings/', { activity: activity.id });
+                await axiosInstance.post('/api/bookings/', { activity: activity.id });
                 setIsRegistered(true);
                 setActivity(prev => prev ? { ...prev, participants_count: prev.participants_count + 1 } : null);
             }

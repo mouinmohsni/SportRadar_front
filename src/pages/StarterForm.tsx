@@ -18,7 +18,7 @@ const StarterForm: React.FC = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            await axiosInstance.post('/companies/signup/', {
+            await axiosInstance.post('/api/companies/signup/', {
                 plan: 'Starter',
                 companyName,
                 adminName,

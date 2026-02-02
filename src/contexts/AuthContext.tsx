@@ -28,7 +28,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchMe = async () => {
     try {
-      const res = await axiosInstance.get('/users/me/');
+      const res = await axiosInstance.get('/api/users/me/');
       console.log("res", res);
       setUser(res.data);
     } catch {
@@ -39,7 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const login = async (email: string, password: string) => {
-    const { data } = await axiosInstance.post('/users/token/', { email, password });
+    const { data } = await axiosInstance.post('/api/users/token/', { email, password });
     localStorage.setItem('access', data.access);
     localStorage.setItem('refresh', data.refresh);
     console.log("data", data);
@@ -54,7 +54,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateUser = async (updates: Partial<User>) => {
-    const { data } = await axiosInstance.patch(`/users/${user?.id}/`, updates);
+    const { data } = await axiosInstance.patch(`/api/users/${user?.id}/`, updates);
     setUser(prev => ({ ...prev!, ...data }));
     return data;
   };

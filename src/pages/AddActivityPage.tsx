@@ -134,13 +134,13 @@ const AddActivityPage: React.FC = () => {
     }
 
     try {
-      await axiosInstance.post('/activities/', formData, {
+      await axiosInstance.post('/api/activities/', formData, {
         headers: {
           'Content-Type': 'multipart/form-data', // Correction du Content-Type
         },
       });
       toast.success('Activité créée avec succès ✅');
-      navigate('/activities');
+      navigate('/api/activities');
     } catch (error: any) {
       console.error('Erreur lors de l\'enregistrement de l\'activité:', error.response?.data || error.message);
       toast.error("Erreur lors de l'enregistrement ❌");

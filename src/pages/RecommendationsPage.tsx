@@ -27,7 +27,7 @@ const RecommendationsPage: React.FC = () => {
         navigator.geolocation.getCurrentPosition(
             async ({ coords }) => {
                 try {
-                    const wRes = await axiosInstance.get<Weather>('weather/', {
+                    const wRes = await axiosInstance.get<Weather>('/api/weather/', {
                         params: { lat: coords.latitude, lon: coords.longitude }
                     });
                     setWeather(wRes.data);

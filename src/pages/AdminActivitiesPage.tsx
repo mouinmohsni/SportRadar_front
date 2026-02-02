@@ -25,7 +25,7 @@ const AdminActivitiesPage: React.FC = () => {
   }, []);
 
   const handleDelete = async (id: number) => {
-    await axiosInstance.delete(`/activities/${id}/`);
+    await axiosInstance.delete(`/api/activities/${id}/`);
     fetchActivities();
   };
 
@@ -33,7 +33,7 @@ const AdminActivitiesPage: React.FC = () => {
     const newName = edited[id];
     if (!newName) return;
 
-    await axiosInstance.put(`/activities/${id}/`, { name: newName });
+    await axiosInstance.put(`/api/activities/${id}/`, { name: newName });
     setEdited(prev => ({ ...prev, [id]: '' }));
     fetchActivities();
   };

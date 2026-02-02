@@ -20,7 +20,7 @@ const BusinessActivitiesPage: React.FC = () => {
 
   const fetchMyActivities = async () => {
     try {
-      const res = await axiosInstance.get('/activities/');
+      const res = await axiosInstance.get('/api/activities/');
       setActivities(res.data);
     } catch (err) {
       console.error('Erreur chargement activités business:', err);
@@ -32,7 +32,7 @@ const BusinessActivitiesPage: React.FC = () => {
   const handleDelete = async (id: number) => {
     if (!window.confirm("Supprimer cette activité ?")) return;
     try {
-      await axiosInstance.delete(`/activities/${id}/`);
+      await axiosInstance.delete(`/api/api/activities/${id}/`);
       setActivities((prev) => prev.filter((a) => a.id !== id));
     } catch (err) {
       console.error("Erreur suppression", err);

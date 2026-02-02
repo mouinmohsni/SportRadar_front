@@ -50,12 +50,12 @@ const ActivitiesPage: React.FC = () => {
     const fetchActivitiesAndBookings = async () => {
       setLoading(true);
       try {
-        const allActivitiesRes = await axiosInstance.get<Activity[]>('/activities/');
+        const allActivitiesRes = await axiosInstance.get<Activity[]>('/api/activities/');
         console.log("allActivitiesRes.data",allActivitiesRes.data)
         setActivities(allActivitiesRes.data);
 
         if (isAuthenticated) {
-          const myBookingsRes = await axiosInstance.get<Booking[]>('/bookings/');
+          const myBookingsRes = await axiosInstance.get<Booking[]>('/api/bookings/');
           const registrationMap = new Map<number, number>();
           myBookingsRes.data.forEach(booking => {
             registrationMap.set(booking.activity.id, booking.id);
@@ -138,7 +138,7 @@ const ActivitiesPage: React.FC = () => {
       const isRegistered = registrations.has(act.id);
       if (isRegistered) {
         const bookingId = registrations.get(act.id);
-        await axiosInstance.delete(`/bookings/${bookingId}/`);
+        await axiosInstance.delete(`/api/bookings/${bookingId}/`);
         setRegistrations(prev => {
           const newMap = new Map(prev);
           newMap.delete(act.id);
@@ -146,7 +146,7 @@ const ActivitiesPage: React.FC = () => {
         });
         setActivities(prev => prev.map(a => a.id === act.id ? { ...a, participants_count: a.participants_count - 1 } : a));
       } else {
-        const response = await axiosInstance.post<Booking>('/bookings/', {
+        const response = await axiosInstance.post<Booking>('/api/bookings/', {
           activity: act.id
         });
         const newBooking = response.data;

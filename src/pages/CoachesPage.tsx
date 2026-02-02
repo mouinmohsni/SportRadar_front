@@ -36,7 +36,7 @@ const CoachesPage: React.FC = () => {
             setLoading(true);
             try {
                 // Récupérer tous les utilisateurs et filtrer les coaches
-                const response = await axiosInstance.get<User[]>('/users/');
+                const response = await axiosInstance.get<User[]>('/api/users/');
                 const coachesOnly = response.data.filter(user => user.type === 'coach');
 
                 // Pour chaque coach qui a une company, récupérer ses infos complètes

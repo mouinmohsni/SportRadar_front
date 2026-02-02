@@ -3,18 +3,27 @@ import axios from 'axios';
 import { refreshAccessToken } from '../utils/auth';
 
 const PUBLIC_ENDPOINTS = [
-  '/users/register/',           // ← Ajout du préfixe /users/
-  '/users/token/',              // ← Ajout du préfixe /users/
-  '/users/token/refresh/',      // ← Ajout du préfixe /users/
-  '/weather/',
-  '/places/',
-  '/activities/',
+  'api/users/register/',           // ← Ajout du préfixe /users/
+  'api/users/token/',              // ← Ajout du préfixe /users/
+  'api/users/token/refresh/',      // ← Ajout du préfixe /users/
+  'api/weather/',
+  'api/places/',
+  'api/activities/',
 ];
 
+
+const baseURL = import.meta.env.VITE_API_URL;
+if (!baseURL) {
+  // En développement, on peut utiliser une valeur par défaut.
+  // En production, cette erreur arrêtera le build si la variable manque, ce qui est une bonne chose.
+  console.error("VITE_API_URL is not defined!");
+}
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
+  baseURL: baseURL || 'http://localhost:8000', // Garder un fallback simple pour le dev
   headers: { 'Content-Type': 'application/json' },
-});
+} );
+
+
 
 
 // Request interceptor

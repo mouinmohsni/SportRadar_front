@@ -35,7 +35,7 @@ const AnalyticsAvancesPage: React.FC = () => {
         window.scrollTo(0, 0);
         (async () => {
             try {
-                const res = await axiosInstance.get('/activities/');
+                const res = await axiosInstance.get('/api/activities/');
                 const all = res.data;
                 setTotalActivities(all.length);
 

@@ -1,13 +1,13 @@
 import axiosInstance from './axiosInstance';
 
 export const signupCompany = (data: any) =>
-    axiosInstance.post('/companies/signup/', data);
+    axiosInstance.post('/api/companies/signup/', data);
 
 export const inviteEmployee = (email: string) =>
-    axiosInstance.post('/invitations/', { email });
+    axiosInstance.post('/api/invitations/', { email });
 
 export const acceptInvite = (payload: any) =>
-    axiosInstance.post('/accept-invite/', payload);
+    axiosInstance.post('/api/accept-invite/', payload);
 
 // ← Ajout fetchPlans
 export const fetchPlans = () =>

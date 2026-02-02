@@ -29,7 +29,7 @@ const PlanForm: React.FC<PlanFormProps> = ({ planKey }) => {
         e.preventDefault();
         setLoading(true);
         try {
-            await axiosInstance.post('subscriptions/', {
+            await axiosInstance.post('/api/subscriptions/', {
                 plan: planKey,
                 company_name: companyName,  // snake_case pour Django
                 admin_name: adminName,      // snake_case

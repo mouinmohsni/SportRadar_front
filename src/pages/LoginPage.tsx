@@ -64,7 +64,7 @@ const LoginPage: React.FC = () => {
           };
         }
 
-        await axiosInstance.post('/users/', registerData);
+        await axiosInstance.post('/api/users/', registerData);
         toast.success('Compte créé avec succès !');
         await login(formData.email, formData.password);
       }
@@ -74,7 +74,7 @@ const LoginPage: React.FC = () => {
         return;
       }
 
-      const { data: me } = await axiosInstance.get<Me>('/users/me/');
+      const { data: me } = await axiosInstance.get<Me>('/api/users/me/');
       if (me.is_staff) navigate('/admin', { replace: true });
       else if (me.type === 'business') navigate('/business', { replace: true });
       else if (me.type === 'coach') navigate('/coach-dashboard', { replace: true });

@@ -31,8 +31,8 @@ const CompanyDashboardPage: React.FC = () => {
         const fetchData = async () => {
             try {
                 const [mRes, sRes] = await Promise.all([
-                    axiosInstance.get<Member[]>(`/companies/${companyId}/members/`),
-                    axiosInstance.get<CompanyStats>(`/companies/${companyId}/stats/`),
+                    axiosInstance.get<Member[]>(`/api/companies/${companyId}/members/`),
+                    axiosInstance.get<CompanyStats>(`/api/companies/${companyId}/stats/`),
                 ]);
                 setMembers(mRes.data);
                 setStats(sRes.data);
