@@ -60,7 +60,7 @@ const AddActivityPage: React.FC = () => {
       }
       try {
         // Endpoint pour récupérer les coachs associés à l'entreprise de l'utilisateur
-        const response = await axiosInstance.get<User[]>(`/companies/${user.company}/coaches/`);
+        const response = await axiosInstance.get<User[]>(`/api/users/`);
         setCoaches(response.data);
         setLoadingCoaches(false);
       } catch (error) {
