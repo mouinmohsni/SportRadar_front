@@ -168,10 +168,17 @@ const CoachesPage: React.FC = () => {
                             >
                                 {/* Avatar du coach */}
                                 <div className="relative">
+
                                     <img
-                                        src={getMediaUrl(coach.avatar) || '/src/assets/avatars/default-avatar.png'}
-                                        alt={getCoachDisplayName(coach)}
-                                        className="w-full h-48 object-cover"
+                                        src={coach.avatar ? getMediaUrl(coach.avatar) : '/avatar1.png'}
+                                        alt={getCoachDisplayName(coach)|| 'Avatar'}
+                                        className="w-12 h-12 rounded-full object-cover mr-4" // CORRECTION 3: Taille d'avatar plus appropriée
+                                        onError={(event) => {
+                                            const target = event.currentTarget;
+                                            if (target.src.includes('avatar1.png')) return;
+                                            target.src = '/avatar1.png';
+                                            target.onerror = null;
+                                        }}
                                     />
                                     {/* Badge Actif */}
                                     {coach.is_active && (

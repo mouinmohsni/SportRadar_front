@@ -56,6 +56,17 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ user }) => {
                             alt={getUserDisplayName()}
                             className="w-20 h-20 rounded-full object-cover border-4 border-[#dc5f18] shadow-lg"
                         />
+                        <img
+                            src={user.avatar ? getMediaUrl(user.avatar) : '/avatar1.png'}
+                            alt={getUserDisplayName() || 'Avatar'}
+                            className="w-12 h-12 rounded-full object-cover mr-4" // CORRECTION 3: Taille d'avatar plus appropriée
+                            onError={(event) => {
+                                const target = event.currentTarget;
+                                if (target.src.includes('avatar1.png')) return;
+                                target.src = '/avatar1.png';
+                                target.onerror = null;
+                            }}
+                        />
                         <div className="absolute -bottom-2 -right-2 bg-[#dc5f18] text-white text-xs px-2 py-1 rounded-full font-semibold shadow-md">
                             {getUserTypeLabel()}
                         </div>

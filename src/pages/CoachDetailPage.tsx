@@ -105,10 +105,17 @@ const CoachDetailPage: React.FC = () => {
             <div className="bg-white shadow-lg rounded-lg p-8 mb-8">
                 <div className="flex items-center mb-6">
                     {/* Avatar du coach */}
+
                     <img
-                        src={getMediaUrl(coach.avatar) || '/src/assets/avatars/default-avatar.png'}
-                        alt={getCoachDisplayName()}
-                        className="w-32 h-32 rounded-full object-cover mr-8 border-4 border-blue-500"
+                        src={coach.avatar ? getMediaUrl(coach.avatar) : '/avatar1.png'}
+                        alt={getCoachDisplayName() || 'Avatar'}
+                        className="w-12 h-12 rounded-full object-cover mr-4" // CORRECTION 3: Taille d'avatar plus appropriée
+                        onError={(event) => {
+                            const target = event.currentTarget;
+                            if (target.src.includes('avatar1.png')) return;
+                            target.src = '/avatar1.png';
+                            target.onerror = null;
+                        }}
                     />
                     <div>
                         {/* ✅ Affichage du nom complet */}

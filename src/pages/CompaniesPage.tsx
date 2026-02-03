@@ -134,6 +134,17 @@ const CompaniesPage: React.FC = () => {
                                         alt={company.name}
                                         className="w-full h-48 object-cover"
                                     />
+                                    <img
+                                        src={company.logo ? getMediaUrl(company.logo) : '/avatar4.png'}
+                                        alt={company.logo|| 'logo'}
+                                        className="w-12 h-12 rounded-full object-cover mr-4" // CORRECTION 3: Taille d'avatar plus appropriée
+                                        onError={(event) => {
+                                            const target = event.currentTarget;
+                                            if (target.src.includes('avatar4.png')) return;
+                                            target.src = '/avatar4.png';
+                                            target.onerror = null;
+                                        }}
+                                    />
                                     {/* Badge Sport Zen */}
                                     {company.sport_zen && (
                                         <div className="absolute top-2 right-2 bg-gradient-to-r from-green-400 to-blue-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md">
