@@ -10,6 +10,7 @@ import {
     XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid
 } from 'recharts';
 import type { Activity, User, Company } from '../../../types';
+import {getMediaUrl} from "../../../utils/media.ts";
 
 interface AdminDashboardProps {
     user: User;
@@ -203,10 +204,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
                                 className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-white rounded-lg hover:shadow-md transition-all"
                             >
                                 <div className="flex items-center space-x-3">
+
                                     <img
-                                        src={user.avatar || '/images/avatar-default.png'}
+                                        src={user.avatar ? getMediaUrl(user.avatar) : '/avatar1.png'}
                                         alt={user.username}
-                                        className="w-10 h-10 rounded-full object-cover"
+                                        className="w-full h-64 object-cover"
+                                        onError={(event) => {
+                                            const target = event.currentTarget;
+                                            if (target.src.includes('avatar1.png')) return;
+                                            target.src = '/avatar1.png';
+                                            target.onerror = null;
+                                        }}
                                     />
                                     <div>
                                         <p className="font-semibold text-[#0a1128]">{user.username}</p>

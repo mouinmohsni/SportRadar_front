@@ -51,11 +51,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ user }) => {
                 <div className="flex items-center space-x-6">
                     {/* Avatar */}
                     <div className="relative">
-                        <img
-                            src={getMediaUrl(user.avatar) || '/images/avatar-default.png'}
-                            alt={getUserDisplayName()}
-                            className="w-20 h-20 rounded-full object-cover border-4 border-[#dc5f18] shadow-lg"
-                        />
+
                         <img
                             src={user.avatar ? getMediaUrl(user.avatar) : '/avatar1.png'}
                             alt={getUserDisplayName() || 'Avatar'}

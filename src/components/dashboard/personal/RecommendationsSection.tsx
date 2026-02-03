@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Sparkles, MapPin, Target, Star, Users, Clock } from 'lucide-react';
 import axiosInstance from '../../../api/axiosInstance';
 import type { Activity, User } from '../../../types';
+import {getMediaUrl} from "../../../utils/media.ts";
 
 interface RecommendationScore {
     activity: Activity;
@@ -246,10 +247,17 @@ const RecommendationsSection: React.FC = () => {
                             {/* Image */}
                             {activity.image ? (
                                 <div className="h-40 overflow-hidden">
+
                                     <img
-                                        src={activity.image}
+                                        src={activity.image ? getMediaUrl(activity.image) : '/activity-default11.jpeg'}
                                         alt={activity.name}
-                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                                        className="w-full h-64 object-cover"
+                                        onError={(event) => {
+                                            const target = event.currentTarget;
+                                            if (target.src.includes('activity-default11.jpeg')) return;
+                                            target.src = '/activity-default11.jpeg';
+                                            target.onerror = null;
+                                        }}
                                     />
                                 </div>
                             ) : (

@@ -242,6 +242,17 @@ const BusinessDashboard: React.FC<BusinessDashboardProps> = ({ user }) => {
                                     alt={coach.username}
                                     className="w-12 h-12 rounded-full object-cover"
                                 />
+                                <img
+                                    src={coach.avatar ? getMediaUrl(coach.avatar) : '/avatar1.png'}
+                                    alt={coach.username}
+                                    className="w-full h-64 object-cover"
+                                    onError={(event) => {
+                                        const target = event.currentTarget;
+                                        if (target.src.includes('avatar1.png')) return;
+                                        target.src = '/avatar1.png';
+                                        target.onerror = null;
+                                    }}
+                                />
                                 <div>
                                     <p className="font-semibold text-[#0a1128]">{coach.username}</p>
                                     <p className="text-xs text-gray-500">{coach.email}</p>
