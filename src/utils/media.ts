@@ -8,10 +8,10 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
  * @param relativePath - Le chemin relatif renvoyé par l'API (ex: "avatars/image.jpg").
  * @returns L'URL complète (ex: "http://localhost:8000/media/avatars/image.jpg" ).
  */
-export const getMediaUrl = (pathOrUrl: string | null | undefined): string | null => {
+export const getMediaUrl = (pathOrUrl: string | null | undefined): string | undefined => {
     // Si le chemin est vide, null ou undefined, on ne fait rien.
     if (!pathOrUrl) {
-        return null;
+        return undefined;
     }
 
     // --- LOGIQUE AMÉLIORÉE ---

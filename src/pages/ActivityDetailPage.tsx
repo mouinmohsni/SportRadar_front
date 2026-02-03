@@ -5,15 +5,17 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
 import type { Activity, ActivityRating, Booking } from '../types';
 import { MapPin, Calendar, Clock, Users, Tag, BarChart, User as UserIcon, Building, Star } from 'lucide-react';
-import { getMediaUrl } from '../utils/media';
+import { getMediaUrl } from '../utils/media'; // Assurez-vous que cette fonction existe et fonctionne
 import { useAuth } from '../contexts/AuthContext';
 import axios from "axios";
 import SEO from "../components/SEO.tsx";
+
 interface ReviewPayload {
-    activity: number; // ou string, selon le type de activity.id
+    activity: number;
     comment: string;
-    score?: number; // Le '?' rend la propriété 'score' optionnelle
+    score?: number;
 }
+
 const ActivityDetailPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [activity, setActivity] = useState<Activity | null>(null);
@@ -30,6 +32,7 @@ const ActivityDetailPage: React.FC = () => {
     const [isReviewSubmitting, setIsReviewSubmitting] = useState(false);
 
     useEffect(() => {
+        // ... (le useEffect ne change pas)
         if (!id || isNaN(Number(id))) {
             setError("ID d'activité invalide.");
             setLoading(false);
@@ -59,6 +62,7 @@ const ActivityDetailPage: React.FC = () => {
         fetchAllData();
     }, [id, isAuthenticated]);
 
+    // ... (les fonctions de chargement et d'erreur ne changent pas)
     if (loading) {
         return <div className="min-h-screen flex justify-center items-center">Chargement de l'activité...</div>;
     }
@@ -67,12 +71,8 @@ const ActivityDetailPage: React.FC = () => {
         return <div className="min-h-screen flex justify-center items-center text-red-500">{error || "Activité non trouvée."}</div>;
     }
 
-    const { date, time } = {
-        date: new Date(activity.start_time).toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
-        time: new Date(activity.start_time).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-    };
-    const imageUrl = getMediaUrl(activity.image);
 
+    // ... (les fonctions handleReviewSubmit et handleRegisterClick ne changent pas)
     const handleReviewSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newComment && newScore === 0) {
@@ -83,9 +83,6 @@ const ActivityDetailPage: React.FC = () => {
 
         setIsReviewSubmitting(true);
         const payload: ReviewPayload = {
-
-
-
             activity: activity.id,
             comment: newComment,
         };
@@ -155,26 +152,39 @@ const ActivityDetailPage: React.FC = () => {
         }
     };
 
+
+    const { date, time } = {
+        date: new Date(activity.start_time).toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+        time: new Date(activity.start_time).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+    };
     const isFull = activity.participants_count >= activity.max_participants;
     const isActivityPast = new Date(activity.start_time) < new Date();
 
     return (
         <>
-
             <SEO
-                title= {`${activity.name} | SportRadar - ${activity.category}`}
+                title={`${activity.name} | SportRadar - ${activity.category}`}
                 description={`${activity.description}`}
             />
 
             <div className="min-h-screen bg-gray-100 py-12 px-4">
                 <div className="max-w-4xl mx-auto">
                     <div className="bg-white rounded-lg shadow-xl overflow-hidden">
+                        {/* CORRECTION 1: Une seule balise <img> pour l'image principale avec la logique de secours */}
                         <img
-                            src={imageUrl || '/images/activity-default.jpg'}
+                            src={activity.image ? getMediaUrl(activity.image) : '/activity-default11.jpeg'}
                             alt={activity.name}
                             className="w-full h-64 object-cover"
+                            onError={(event) => {
+                                const target = event.currentTarget;
+                                if (target.src.includes('activity-default11.jpeg')) return;
+                                target.src = '/activity-default11.jpeg';
+                                target.onerror = null;
+                            }}
                         />
+
                         <div className="p-8">
+                            {/* ... (Le reste du contenu de la description ne change pas) */}
                             <h1 className="text-4xl font-bold text-[#0a1128] mb-4">{activity.name}</h1>
 
                             {activity.description && (
@@ -244,6 +254,7 @@ const ActivityDetailPage: React.FC = () => {
                         </div>
 
                         <div className="p-8 border-t">
+                            {/* ... (La section des avis ne change pas jusqu'à la liste des commentaires) */}
                             <h2 className="text-3xl font-bold text-[#0a1128] mb-6">Avis et Commentaires</h2>
 
                             <div className="flex items-center mb-8 p-4 bg-gray-50 rounded-lg">
@@ -289,10 +300,17 @@ const ActivityDetailPage: React.FC = () => {
                                     activity.ratings.map(rating => (
                                         <div key={rating.id} className="p-4 border-b hover:bg-gray-50 transition-colors rounded-lg">
                                             <div className="flex items-center mb-3">
+                                                {/* CORRECTION 2: Logique de secours pour l'avatar de l'utilisateur */}
                                                 <img
-                                                    src={getMediaUrl(rating.user?.avatar) || '/src/assets/avatars/default-avatar.png'}
-                                                    alt={rating.user?.username}
-                                                    className="w-12 h-12 rounded-full mr-4 border-2 border-gray-200"
+                                                    src={rating.user?.avatar ? getMediaUrl(rating.user.avatar) : '/avatar1.png'}
+                                                    alt={rating.user?.username || 'Avatar'}
+                                                    className="w-12 h-12 rounded-full object-cover mr-4" // CORRECTION 3: Taille d'avatar plus appropriée
+                                                    onError={(event) => {
+                                                        const target = event.currentTarget;
+                                                        if (target.src.includes('avatar1.png')) return;
+                                                        target.src = '/avatar1.png';
+                                                        target.onerror = null;
+                                                    }}
                                                 />
                                                 <div>
                                                     <p className="font-bold text-gray-900">
