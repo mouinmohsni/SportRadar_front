@@ -35,7 +35,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onUpdate }) => {
         setAvatarPreview(URL.createObjectURL(file));
 
         try {
-            await axiosInstance.patch(`/api/users/${user.id}/`, form, {
+            await axiosInstance.patch(`/api/users/me/update/`, form, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             onUpdate();
@@ -62,7 +62,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onUpdate }) => {
         setAvatarPreview(avatarOptions[key as keyof typeof avatarOptions]);
 
         try {
-            await axiosInstance.patch(`/api/users/${user.id}/`, { avatar: key });
+            await axiosInstance.patch(`/api/users/me/update/`, { avatar: key });
             onUpdate();
             setStatus('Avatar mis à jour ✔️');
         } catch (error: unknown) {
@@ -84,7 +84,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onUpdate }) => {
         setStatus('');
 
         try {
-            await axiosInstance.patch(`/api/users/${user.id}/`, {
+            await axiosInstance.patch(`/api/users/me/update/`, {
                 first_name: firstName,
                 last_name: lastName
             });

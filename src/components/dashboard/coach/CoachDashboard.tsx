@@ -30,12 +30,12 @@ const CoachDashboard: React.FC<CoachDashboardProps> = ({ user }) => {
             setLoading(true);
             try {
                 // 1. Récupérer les activités du coach
-                const activitiesResponse = await axiosInstance.get<Activity[]>(`/users/${user.id}/activities/`);
+                const activitiesResponse = await axiosInstance.get<Activity[]>(`/api/users/${user.id}/activities/`);
                 const activitiesData = activitiesResponse.data;
                 console.log('Coach activities:', activitiesResponse);
 
                 // 2. Récupérer tous les bookings
-                const bookingsResponse = await axiosInstance.get<Booking[]>('/bookings/');
+                const bookingsResponse = await axiosInstance.get<Booking[]>('/api/bookings/');
                 const bookingsData = bookingsResponse.data;
                 console.log('All bookings:', bookingsData);
 

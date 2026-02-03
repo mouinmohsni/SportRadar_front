@@ -44,7 +44,7 @@ const CoachesPage: React.FC = () => {
                     coachesOnly.map(async (coach) => {
                         if (coach.company && typeof coach.company === 'number') {
                             try {
-                                const companyResponse = await axiosInstance.get<Company>(`/companies/${coach.company}/`);
+                                const companyResponse = await axiosInstance.get<Company>(`/api/companies/${coach.company}/`);
                                 return { ...coach, company: companyResponse.data };
                             } catch (err) {
                                 console.error(`Erreur lors de la récupération de la salle ${coach.company}:`, err);
