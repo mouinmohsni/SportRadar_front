@@ -28,11 +28,11 @@ const BusinessDashboard: React.FC<BusinessDashboardProps> = ({ user }) => {
             try {
                 if (user.company) {
                     // Récupérer les activités de l'entreprise
-                    const { data: activitiesData } = await axiosInstance.get<Activity[]>(`/companies/${user.company}/activities/`);
+                    const { data: activitiesData } = await axiosInstance.get<Activity[]>(`/api//companies/${user.company}/activities/`);
                     setActivities(activitiesData);
 
                     // Récupérer les coaches de l'entreprise
-                    const { data: coachesData } = await axiosInstance.get<CoachUser[]>(`/companies/${user.company}/coaches/`);
+                    const { data: coachesData } = await axiosInstance.get<CoachUser[]>(`/api/companies/${user.company}/coaches/`);
                     setCoaches(coachesData);
                 }
             } catch {

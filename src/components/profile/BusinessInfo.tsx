@@ -20,15 +20,15 @@ const BusinessInfo: React.FC<BusinessInfoProps> = ({ user }) => {
             try {
                 // Récupérer les infos de la company
                 if (user.company && typeof user.company === 'number') {
-                    const companyResponse = await axiosInstance.get<Company>(`/companies/${user.company}/`);
+                    const companyResponse = await axiosInstance.get<Company>(`/api/companies/${user.company}/`);
                     setCompany(companyResponse.data);
 
                     // Récupérer les coaches de l'entreprise
-                    const coachesResponse = await axiosInstance.get<User[]>(`/companies/${user.company}/coaches/`);
+                    const coachesResponse = await axiosInstance.get<User[]>(`/api/companies/${user.company}/coaches/`);
                     setCoaches(coachesResponse.data);
 
                     // Récupérer les activités de l'entreprise
-                    const activitiesResponse = await axiosInstance.get<Activity[]>(`/companies/${user.company}/activities/`);
+                    const activitiesResponse = await axiosInstance.get<Activity[]>(`/api/companies/${user.company}/activities/`);
                     setActivities(activitiesResponse.data);
                 } else if (user.company && typeof user.company === 'object') {
                     setCompany(user.company);

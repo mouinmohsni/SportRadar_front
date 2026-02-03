@@ -50,7 +50,7 @@ const PersonalDashboard: React.FC<PersonalDashboardProps> = ({ user }) => {
             setLoading(true);
 
             // Récupérer les réservations
-            const bookingsResponse = await axiosInstance.get<Booking[]>('/bookings/');
+            const bookingsResponse = await axiosInstance.get<Booking[]>('/api/bookings/');
             const bookingsData = bookingsResponse.data;
             setBookings(bookingsData);
 

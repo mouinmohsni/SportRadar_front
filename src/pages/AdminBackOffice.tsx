@@ -57,7 +57,7 @@ const AdminBackOffice: React.FC = () => {
       });
       setSuccess("Compte business créé !");
       // recharger la liste
-      const res = await axiosInstance.get('/users/');
+      const res = await axiosInstance.get('/api/users/');
       setBusinessList(res.data.filter((u:any)=>u.type==='business'));
     } catch (err: any) {
       setError(err.response?.data||"Erreur serveur");

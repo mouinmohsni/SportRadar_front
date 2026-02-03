@@ -18,12 +18,12 @@ const CoachInfo: React.FC<CoachInfoProps> = ({ user }) => {
         const fetchCoachData = async () => {
             try {
                 // Récupérer les activités du coach
-                const activitiesResponse = await axiosInstance.get<Activity[]>(`/users/${user.id}/activities/`);
+                const activitiesResponse = await axiosInstance.get<Activity[]>(`/api/users/${user.id}/activities/`);
                 setActivities(activitiesResponse.data);
 
                 // Récupérer les infos de la company si elle existe
                 if (user.company && typeof user.company === 'number') {
-                    const companyResponse = await axiosInstance.get<Company>(`/companies/${user.company}/`);
+                    const companyResponse = await axiosInstance.get<Company>(`/api/companies/${user.company}/`);
                     setCompany(companyResponse.data);
                 } else if (user.company && typeof user.company === 'object') {
                     setCompany(user.company);

@@ -25,12 +25,12 @@ const RecommendationsSection: React.FC = () => {
             setLoading(true);
 
             // Récupérer les infos utilisateur
-            const userResponse = await axiosInstance.get('/users/me/');
+            const userResponse = await axiosInstance.get('/api/users/me/');
             const userData = userResponse.data;
             setUser(userData);
 
             // Récupérer toutes les activités
-            const activitiesResponse = await axiosInstance.get('/activities/');
+            const activitiesResponse = await axiosInstance.get('/api/activities/');
             const activities = activitiesResponse.data.results || activitiesResponse.data;
 
             // Calculer les scores de recommandation
