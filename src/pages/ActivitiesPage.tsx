@@ -244,7 +244,7 @@ const ActivitiesPage: React.FC = () => {
                       {/* ✅ Image avec fallback */}
                       <img
                           // On essaie de charger l'image de l'API.
-                          src={act.image ? getImageUrl(act.image) : '/activities/activity-default11.jpeg'}
+                          src={act.image ? getImageUrl(act.image) : '/activity-default11.jpeg'}
                           alt={act.name}
                           className="w-full h-48 object-cover"
 
@@ -261,7 +261,7 @@ const ActivitiesPage: React.FC = () => {
 
                             // On remplace la source de l'image par notre image de secours.
                             // Assurez-vous que le nom du fichier est EXACTEMENT correct.
-                            target.src = '/activities/activity-default11.jpeg';
+                            target.src = '/activity-default11.jpeg';
 
                             // Optionnel mais propre : on désactive l'événement onError pour cet élément
                             // une fois qu'il a été déclenché, pour être sûr à 100%.
