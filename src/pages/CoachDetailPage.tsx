@@ -67,10 +67,29 @@ const CoachDetailPage: React.FC = () => {
     }
 
     // Helper pour formater la durée (HH:MM:SS -> "Xh Ymin")
-    const formatDuration = (duration: string): string => {
-        const [hours, minutes] = duration.split(':');
-        const h = parseInt(hours);
-        const m = parseInt(minutes);
+    const formatDuration = (duration: string | null | undefined): string => {
+        // ✅ SÉCURITÉ : On vérifie si la durée existe et est une chaîne de caractères.
+        if (!duration || typeof duration !== 'string') {
+            return 'N/A'; // On retourne une valeur par défaut si la durée est manquante.
+        }
+
+        // On continue seulement si la durée est une chaîne valide.
+        const parts = duration.split(':');
+
+        // ✅ SÉCURITÉ : On s'assure qu'on a bien au moins les heures et les minutes.
+        if (parts.length < 2) {
+            return 'Durée invalide';
+        }
+
+        const [hours, minutes] = parts;
+        const h = parseInt(hours, 10); // Toujours spécifier la base (10) avec parseInt
+        const m = parseInt(minutes, 10);
+
+        // On vérifie si les valeurs sont bien des nombres.
+        if (isNaN(h) || isNaN(m)) {
+            return 'Durée invalide';
+        }
+
         if (h > 0) {
             return `${h}h${m > 0 ? ` ${m}min` : ''}`;
         }
