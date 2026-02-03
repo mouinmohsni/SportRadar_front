@@ -61,7 +61,8 @@ const AddActivityPage: React.FC = () => {
       try {
         // Endpoint pour récupérer les coachs associés à l'entreprise de l'utilisateur
         const response = await axiosInstance.get<User[]>(`/api/users/`);
-        setCoaches(response.data);
+        const cotches = response.data.filter(user => user.type === 'coach')
+        setCoaches(cotches);
         setLoadingCoaches(false);
       } catch (error) {
         console.error('Erreur lors du chargement des coachs:', error);
@@ -344,7 +345,7 @@ const AddActivityPage: React.FC = () => {
               <option value="">{loadingCoaches ? 'Chargement des coachs...' : 'Sélectionner un instructeur'}</option>
               {coaches.map(coach => (
                   <option key={coach.id} value={coach.id}>
-                    {coach.first_name} {coach.last_name}
+                    {coach.username}
                   </option>
               ))}
             </select>
