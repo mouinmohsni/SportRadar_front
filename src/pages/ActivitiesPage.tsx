@@ -243,12 +243,29 @@ const ActivitiesPage: React.FC = () => {
                     <div key={act.id} className="bg-white rounded-2xl shadow-lg flex flex-col overflow-hidden hover:shadow-2xl transition-shadow">
                       {/* ✅ Image avec fallback */}
                       <img
+                          // On essaie de charger l'image de l'API.
                           src={act.image ? getImageUrl(act.image) : '/activities/activity-default11.jpeg'}
                           alt={act.name}
                           className="w-full h-48 object-cover"
+
+                          // Si le chargement échoue...
                           onError={(event) => {
-                            // On remplace la source de l'image par notre image de secours locale.
-                            event.currentTarget.src = '/activities/activity-default11.jpeg';
+                            const target = event.currentTarget;
+
+                            // ✅ SÉCURITÉ ANTI-BOUCLE :
+                            // On vérifie si on n'a pas déjà essayé de mettre l'image par défaut.
+                            // Si la source est déjà l'image par défaut, on arrête tout.
+                            if (target.src.includes('activity-default11.jpeg')) {
+                              return; // Sort de la fonction pour éviter la boucle
+                            }
+
+                            // On remplace la source de l'image par notre image de secours.
+                            // Assurez-vous que le nom du fichier est EXACTEMENT correct.
+                            target.src = '/activities/activity-default11.jpeg';
+
+                            // Optionnel mais propre : on désactive l'événement onError pour cet élément
+                            // une fois qu'il a été déclenché, pour être sûr à 100%.
+                            target.onerror = null;
                           }}
                       />
                       <div className="p-4 flex-1 flex flex-col justify-between">
