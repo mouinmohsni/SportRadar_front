@@ -243,9 +243,13 @@ const ActivitiesPage: React.FC = () => {
                     <div key={act.id} className="bg-white rounded-2xl shadow-lg flex flex-col overflow-hidden hover:shadow-2xl transition-shadow">
                       {/* ✅ Image avec fallback */}
                       <img
-                          src={getImageUrl(act.image)}
+                          src={act.image ? getImageUrl(act.image) : '/activities/activity-default11.jpeg'}
                           alt={act.name}
                           className="w-full h-48 object-cover"
+                          onError={(event) => {
+                            // On remplace la source de l'image par notre image de secours locale.
+                            event.currentTarget.src = '/activities/activity-default11.jpeg';
+                          }}
                       />
                       <div className="p-4 flex-1 flex flex-col justify-between">
                         <div>

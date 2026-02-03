@@ -66,7 +66,7 @@ const PersonalPreferences: React.FC<PersonalPreferencesProps> = ({ user, onUpdat
         setStatus('');
 
         try {
-            await axiosInstance.patch(`/users/${user.id}/`, {
+            await axiosInstance.patch(`/api/users/me/update/`, {
                 preferences: preferences
             });
             onUpdate();
