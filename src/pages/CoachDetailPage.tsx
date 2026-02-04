@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import React, {useState, useEffect} from 'react';
+import {useParams} from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
-import { getMediaUrl } from '../utils/media';
+import {getImageUrl, getMediaUrl} from '../utils/media';
 import type {Activity, Company, User} from '../types';
 import SEO from '../components/SEO';
 
@@ -11,7 +11,7 @@ import SEO from '../components/SEO';
 // ============================================
 
 const CoachDetailPage: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
+    const {id} = useParams<{ id: string }>();
     const [coach, setCoach] = useState<User | null>(null);
     const [activities, setActivities] = useState<Activity[]>([]);
     const [loading, setLoading] = useState(true);
@@ -21,19 +21,24 @@ const CoachDetailPage: React.FC = () => {
         // ✅ Faire 2 appels API en parallèle
         Promise.all([
             axiosInstance.get<User>(`/api/users/${id}/`),
-            axiosInstance.get<Activity[]>(`/api/users/${id}/activities/`)
+            axiosInstance.get<Activity[]>(`/api/activities/`)
         ])
             .then(([coachResponse, activitiesResponse]) => {
                 const coachData = coachResponse.data;
+                const activitiesData = activitiesResponse.data.filter(activity  => activity?.instructor?.id==id);
+                console.log('Coach activities:', activitiesResponse);
+
                 setCoach(coachData);
-                setActivities(activitiesResponse.data);
+                setActivities(activitiesData);
+                console.log("activitiesDataaaaaaaaaaa",activitiesData)
+                console.log("coachDataaaaaaaaaa",coachData)
 
                 // ✅ Si le coach a une company, récupérer ses infos
                 if (coachData.company) {
                     axiosInstance.get<Company>(`/companies/${coachData.company}/`)
                         .then(companyResponse => {
                             // Mettre à jour le coach avec les infos complètes de la company
-                            setCoach(prev => prev ? { ...prev, company: companyResponse.data } : null);
+                            setCoach(prev => prev ? {...prev, company: companyResponse.data} : null);
                         })
                         .catch(err => {
                             console.error("Erreur lors de la récupération de la salle de sport:", err);
@@ -109,7 +114,7 @@ const CoachDetailPage: React.FC = () => {
         }
         return coach.username;
     };
-    console.log("coach",coach)
+    console.log("coach", coach)
     return (
         <>
             <SEO
@@ -118,188 +123,210 @@ const CoachDetailPage: React.FC = () => {
             />
 
             <div className="p-8 max-w-7xl mx-auto">
-            {/* ============================================ */}
-            {/* EN-TÊTE AVEC AVATAR ET INFORMATIONS DU COACH */}
-            {/* ============================================ */}
-            <div className="bg-white shadow-lg rounded-lg p-8 mb-8">
-                <div className="flex items-center mb-6">
-                    {/* Avatar du coach */}
+                {/* ============================================ */}
+                {/* EN-TÊTE AVEC AVATAR ET INFORMATIONS DU COACH */}
+                {/* ============================================ */}
+                <div className="bg-white shadow-lg rounded-lg p-8 mb-8">
+                    <div className="flex items-center mb-6">
+                        {/* Avatar du coach */}
 
-                    <img
-                        src={coach.avatar ? getMediaUrl(coach.avatar) : '/avatar1.png'}
-                        alt={getCoachDisplayName() || 'Avatar'}
-                        className="w-12 h-12 rounded-full object-cover mr-4" // CORRECTION 3: Taille d'avatar plus appropriée
-                        onError={(event) => {
-                            const target = event.currentTarget;
-                            if (target.src.includes('avatar1.png')) return;
-                            target.src = '/avatar1.png';
-                            target.onerror = null;
-                        }}
-                    />
-                    <div>
-                        {/* ✅ Affichage du nom complet */}
-                        <h1 className="text-4xl font-bold text-gray-800 mb-2">
-                            {getCoachDisplayName()}
-                        </h1>
-                        <p className="text-xl text-gray-600 mb-2">@{coach.username}</p>
-                        {coach.email && (
-                            <p className="text-gray-500">
-                                <span className="font-semibold">📧 Email :</span> {coach.email}
-                            </p>
-                        )}
-                        {coach.company && (
-                            <div className="mt-2">
+                        <img
+                            src={coach.avatar ? getMediaUrl(coach.avatar) : '/avatar1.png'}
+                            alt={getCoachDisplayName() || 'Avatar'}
+                            className="w-12 h-12 rounded-full object-cover mr-4" // CORRECTION 3: Taille d'avatar plus appropriée
+                            onError={(event) => {
+                                const target = event.currentTarget;
+                                if (target.src.includes('avatar1.png')) return;
+                                target.src = '/avatar1.png';
+                                target.onerror = null;
+                            }}
+                        />
+                        <div>
+                            {/* ✅ Affichage du nom complet */}
+                            <h1 className="text-4xl font-bold text-gray-800 mb-2">
+                                {getCoachDisplayName()}
+                            </h1>
+                            <p className="text-xl text-gray-600 mb-2">@{coach.username}</p>
+                            {coach.email && (
                                 <p className="text-gray-500">
-                                    <span className="font-semibold">🏢 Salle de sport :</span>  {coach.company.name}
+                                    <span className="font-semibold">📧 Email :</span> {coach.email}
                                 </p>
-                                {coach.company.address && (
-                                    <p className="text-gray-500 text-sm">
-                                        📍 {coach.company.address}, {coach.company.city}
+                            )}
+                            {coach.company && (
+                                <div className="mt-2">
+                                    <p className="text-gray-500">
+                                        <span className="font-semibold">🏢 Salle de sport :</span> {coach.company.name}
                                     </p>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* Statistiques */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                    <div className="bg-blue-50 p-4 rounded-lg">
-                        <p className="text-sm text-gray-600">Activités proposées</p>
-                        <p className="text-3xl font-bold text-blue-600">{activities.length}</p>
-                    </div>
-                    <div className="bg-green-50 p-4 rounded-lg">
-                        <p className="text-sm text-gray-600">Statut</p>
-                        <p className="text-xl font-semibold text-green-600">
-                            {coach.is_active ? '✅ Actif' : '❌ Inactif'}
-                        </p>
-                    </div>
-                    <div className="bg-purple-50 p-4 rounded-lg">
-                        <p className="text-sm text-gray-600">Type</p>
-                        <p className="text-xl font-semibold text-purple-600">Coach Professionnel</p>
-                    </div>
-                </div>
-            </div>
-
-            {/* ============================================ */}
-            {/* SECTION DES ACTIVITÉS */}
-            {/* ============================================ */}
-            <div>
-                <h2 className="text-3xl font-bold mb-6 text-gray-800">Activités proposées</h2>
-
-                {activities.length === 0 ? (
-                    <div className="bg-gray-100 p-8 rounded-lg text-center">
-                        <p className="text-gray-600 text-lg">
-                            Ce coach ne propose aucune activité pour le moment.
-                        </p>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {activities.map(activity => (
-                            <div
-                                key={activity.id}
-                                className="bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden"
-                            >
-                                {/* Image de l'activité */}
-                                <img
-                                    src={getMediaUrl(activity.image) || '/images/activity-default.jpg'}
-                                    alt={activity.name}
-                                    className="w-full h-48 object-cover"
-                                />
-
-
-                                <div className="p-5">
-                                    {/* Nom de l'activité */}
-                                    <h3 className="font-bold text-xl mb-2 text-gray-800">
-                                        {activity.name}
-                                    </h3>
-
-                                    {/* Description */}
-                                    {activity.description && (
-                                        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                                            {activity.description}
+                                    {coach.company.address && (
+                                        <p className="text-gray-500 text-sm">
+                                            📍 {coach.company.address}, {coach.company.city}
                                         </p>
                                     )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
 
-                                    {/* Informations détaillées */}
-                                    <div className="space-y-2 text-sm text-gray-600">
-                                        {/* Date */}
-                                        <p>
-                                            <span className="font-semibold">📅 Date :</span>{' '}
-                                            {new Date(activity.start_time).toLocaleDateString('fr-FR', {
-                                                weekday: 'long',
-                                                year: 'numeric',
-                                                month: 'long',
-                                                day: 'numeric'
-                                            })}
-                                        </p>
+                    {/* Statistiques */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                        <div className="bg-blue-50 p-4 rounded-lg">
+                            <p className="text-sm text-gray-600">Activités proposées</p>
+                            <p className="text-3xl font-bold text-blue-600">{activities.length}</p>
+                        </div>
+                        <div className="bg-green-50 p-4 rounded-lg">
+                            <p className="text-sm text-gray-600">Statut</p>
+                            <p className="text-xl font-semibold text-green-600">
+                                {activities.length ? '✅ Actif' : '❌ Inactif'}
+                            </p>
+                        </div>
+                        <div className="bg-purple-50 p-4 rounded-lg">
+                            <p className="text-sm text-gray-600">Type</p>
+                            <p className="text-xl font-semibold text-purple-600">Coach Professionnel</p>
+                        </div>
+                    </div>
+                </div>
 
-                                        {/* Heure */}
-                                        <p>
-                                            <span className="font-semibold">🕐 Heure :</span>{' '}
-                                            {new Date(activity.start_time).toLocaleTimeString('fr-FR', {
-                                                hour: '2-digit',
-                                                minute: '2-digit'
-                                            })}
-                                        </p>
+                {/* ============================================ */}
+                {/* SECTION DES ACTIVITÉS */}
+                {/* ============================================ */}
+                <div>
+                    <h2 className="text-3xl font-bold mb-6 text-gray-800">Activités proposées</h2>
 
-                                        {/* Durée */}
-                                        <p>
-                                            <span className="font-semibold">⏱️ Durée :</span>{' '}
-                                            {formatDuration(activity.duration)}
-                                        </p>
+                    {activities.length === 0 ? (
+                        <div className="bg-gray-100 p-8 rounded-lg text-center">
+                            <p className="text-gray-600 text-lg">
+                                Ce coach ne propose aucune activité pour le moment.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {activities.map(activity => (
+                                <div
+                                    key={activity.id}
+                                    className="bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden"
+                                >
+                                    {/* Image de l'activité */}
 
-                                        {/* Lieu */}
-                                        <p>
-                                            <span className="font-semibold">📍 Lieu :</span>{' '}
-                                            {activity.effective_location || activity.location_address}
-                                        </p>
+                                    <img
+                                        // On essaie de charger l'image de l'API.
+                                        src={activity.image ? getImageUrl(activity.image) : '/activity-default11.jpeg'}
+                                        alt={activity.name}
+                                        className="w-full h-48 object-cover"
 
-                                        {/* Niveau */}
-                                        <p>
-                                            <span className="font-semibold">🎯 Niveau :</span>{' '}
-                                            {activity.level === 'all' ? 'Tous niveaux' :
-                                                activity.level === 'beginner' ? 'Débutant' :
-                                                    activity.level === 'intermediate' ? 'Intermédiaire' :
-                                                        'Avancé'}
-                                        </p>
+                                        // Si le chargement échoue...
+                                        onError={(event) => {
+                                            const target = event.currentTarget;
 
-                                        {/* Places */}
-                                        <p>
-                                            <span className="font-semibold">👥 Places :</span>{' '}
-                                            {activity.participants_count}/{activity.max_participants}
-                                        </p>
+                                            // ✅ SÉCURITÉ ANTI-BOUCLE :
+                                            // On vérifie si on n'a pas déjà essayé de mettre l'image par défaut.
+                                            // Si la source est déjà l'image par défaut, on arrête tout.
+                                            if (target.src.includes('activity-default11.jpeg')) {
+                                                return; // Sort de la fonction pour éviter la boucle
+                                            }
 
-                                        {/* Prix */}
-                                        <p>
-                                            <span className="font-semibold">💰 Prix :</span>{' '}
-                                            {activity.price}€
-                                        </p>
+                                            // On remplace la source de l'image par notre image de secours.
+                                            // Assurez-vous que le nom du fichier est EXACTEMENT correct.
+                                            target.src = '/activity-default11.jpeg';
 
-                                        {/* Note moyenne */}
-                                        {activity.average_score && (
-                                            <p>
-                                                <span className="font-semibold">⭐ Note :</span>{' '}
-                                                {activity.average_score.toFixed(1)}/5
-                                                {' '}({activity.ratings.length} avis)
+                                            // Optionnel mais propre : on désactive l'événement onError pour cet élément
+                                            // une fois qu'il a été déclenché, pour être sûr à 100%.
+                                            target.onerror = null;
+                                        }}
+                                    />
+
+
+                                    <div className="p-5">
+                                        {/* Nom de l'activité */}
+                                        <h3 className="font-bold text-xl mb-2 text-gray-800">
+                                            {activity.name}
+                                        </h3>
+
+                                        {/* Description */}
+                                        {activity.description && (
+                                            <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                                                {activity.description}
                                             </p>
                                         )}
-                                    </div>
 
-                                    {/* Bouton pour voir les détails */}
-                                    <button
-                                        onClick={() => window.location.href = `/activities/${activity.id}`}
-                                        className="mt-4 w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-300 font-semibold"
-                                    >
-                                        Voir les détails
-                                    </button>
+                                        {/* Informations détaillées */}
+                                        <div className="space-y-2 text-sm text-gray-600">
+                                            {/* Date */}
+                                            <p>
+                                                <span className="font-semibold">📅 Date :</span>{' '}
+                                                {new Date(activity.start_time).toLocaleDateString('fr-FR', {
+                                                    weekday: 'long',
+                                                    year: 'numeric',
+                                                    month: 'long',
+                                                    day: 'numeric'
+                                                })}
+                                            </p>
+
+                                            {/* Heure */}
+                                            <p>
+                                                <span className="font-semibold">🕐 Heure :</span>{' '}
+                                                {new Date(activity.start_time).toLocaleTimeString('fr-FR', {
+                                                    hour: '2-digit',
+                                                    minute: '2-digit'
+                                                })}
+                                            </p>
+
+                                            {/* Durée */}
+                                            <p>
+                                                <span className="font-semibold">⏱️ Durée :</span>{' '}
+                                                {formatDuration(activity.duration)}
+                                            </p>
+
+                                            {/* Lieu */}
+                                            <p>
+                                                <span className="font-semibold">📍 Lieu  :</span>
+                                                {activity.effective_location}
+                                            </p>
+
+                                            {/* Niveau */}
+                                            <p>
+                                                <span className="font-semibold">🎯 Niveau :</span>{' '}
+                                                {activity.level === 'all' ? 'Tous niveaux' :
+                                                    activity.level === 'beginner' ? 'Débutant' :
+                                                        activity.level === 'intermediate' ? 'Intermédiaire' :
+                                                            'Avancé'}
+                                            </p>
+
+                                            {/* Places */}
+                                            <p>
+                                                <span className="font-semibold">👥 Places :</span>{' '}
+                                                {activity.participants_count}/{activity.max_participants}
+                                            </p>
+
+                                            {/* Prix */}
+                                            <p>
+                                                <span className="font-semibold">💰 Prix :</span>{' '}
+                                                {activity.price}€
+                                            </p>
+
+                                            {/* Note moyenne */}
+                                            {activity.average_score && (
+                                                <p>
+                                                    <span className="font-semibold">⭐ Note :</span>{' '}
+                                                    {activity.average_score.toFixed(1)}/5
+                                                    {' '}({activity.ratings.length} avis)
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        {/* Bouton pour voir les détails */}
+                                        <button
+                                            onClick={() => window.location.href = `/activities/${activity.id}`}
+                                            className="mt-4 w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-300 font-semibold"
+                                        >
+                                            Voir les détails
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
-        </div>
         </>
     );
 };

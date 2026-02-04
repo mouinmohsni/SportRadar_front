@@ -23,7 +23,7 @@ const ActivityDetailPage: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
 
     const navigate = useNavigate();
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated,user } = useAuth();
     const [isRegistered, setIsRegistered] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -229,6 +229,7 @@ const ActivityDetailPage: React.FC = () => {
                             </div>
 
                             <div className="mt-8 border-t pt-6 flex justify-end">
+                                {user?.type === 'personal' ? (
                                 <button
                                     onClick={handleRegisterClick}
                                     disabled={isSubmitting || (isFull && !isRegistered)}
@@ -250,6 +251,7 @@ const ActivityDetailPage: React.FC = () => {
                                                 : `S'inscrire ( ${activity.price} € )`
                                     }
                                 </button>
+                                ):(<div></div>)}
                             </div>
                         </div>
 
@@ -271,7 +273,7 @@ const ActivityDetailPage: React.FC = () => {
                                 </div>
                             </div>
 
-                            {isAuthenticated && (
+                            {isAuthenticated && user?.type === 'personal' &&  (
                                 <div className="mb-8">
                                     <h3 className="text-xl font-semibold mb-4">Laissez votre avis</h3>
                                     <form onSubmit={handleReviewSubmit}>

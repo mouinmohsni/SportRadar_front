@@ -77,7 +77,7 @@ const LoginPage: React.FC = () => {
       const { data: me } = await axiosInstance.get<Me>('/api/users/me/');
       if (me.is_staff) navigate('/admin', { replace: true });
       else if (me.type === 'business') navigate('/business', { replace: true });
-      else if (me.type === 'coach') navigate('/coach-dashboard', { replace: true });
+      else if (me.type === 'coach') navigate('/dashboard', { replace: true });
       else navigate('/profile', { replace: true });
 
     } catch (err: any) {

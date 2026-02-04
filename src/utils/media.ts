@@ -32,3 +32,9 @@ export const getMediaUrl = (pathOrUrl: string | null | undefined): string | unde
 
     return `${API_BASE_URL}/media/${cleanedPath}`;
 };
+
+export const getImageUrl = (img: string | null | undefined) => {
+    if (!img) return '/images/activity-default.jpg';
+    if (/^https?:\/\//i.test(img)) return img;
+    return `${import.meta.env.VITE_MEDIA_URL}${img}`;
+};

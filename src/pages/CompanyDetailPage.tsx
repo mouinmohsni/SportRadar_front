@@ -51,6 +51,11 @@ const CompanyDetailPage: React.FC = () => {
                 setCompany(companyResponse.data);
                 setCoaches(coachesResponse.data);
                 setActivities(activitiesResponse.data);
+
+                console.log("companyResponse.data= ",companyResponse.data)
+                console.log("coachesResponse.data== ",coachesResponse.data)
+                console.log("activitiesResponse.data === ",activitiesResponse.data)
+
             })
             .catch(err => {
                 console.error("Erreur lors du chargement de la salle de sport", err);

@@ -22,16 +22,16 @@ interface ActivityWithParticipants extends Activity {
 
 const CoachDashboard: React.FC<CoachDashboardProps> = ({ user }) => {
     const navigate = useNavigate();
-    const [activities, setActivities] = useState<any[]>([]);
+    const [activities, setActivities] = useState<Activity[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                // 1. Récupérer les activités du coach
-                const activitiesResponse = await axiosInstance.get<Activity[]>(`/api/users/${user.id}/activities/`);
-                const activitiesData = activitiesResponse.data;
+                // 1. Récupérer les activités du coach ${user.id}
+                const activitiesResponse = await axiosInstance.get<Activity[]>(`/api/activities/`);
+                const activitiesData = activitiesResponse.data.filter(activity  => activity?.instructor?.id==user.id);
                 console.log('Coach activities:', activitiesResponse);
 
                 // 2. Récupérer tous les bookings
@@ -73,6 +73,9 @@ const CoachDashboard: React.FC<CoachDashboardProps> = ({ user }) => {
 
     // Graphique : Participants par activité
     const participantsByActivity = useMemo(() => {
+        if (!activities) {
+            return [];
+        }
         return activities.slice(0, 5).map(a => ({
             name: a.name.length > 15 ? a.name.substring(0, 15) + '...' : a.name,
             participants: a.participants_count,
