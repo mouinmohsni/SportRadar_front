@@ -164,7 +164,7 @@ const CompaniesPage: React.FC = () => {
                                         {/* Ville */}
                                         <div className="flex items-center gap-2">
                                             <MapPin className="w-4 h-4 text-[#dc5f18]" />
-                                            <span>{company.city}</span>
+                                            <span>{company.address}</span>
                                         </div>
 
                                         {/* Site web */}

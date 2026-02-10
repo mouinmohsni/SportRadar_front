@@ -78,7 +78,8 @@ export interface Activity {
   name: string;
   description: string | null;
   category: string;
-  image: string | null;
+  image: string | File | null;
+
 
   start_time: string; // Format ISO 8601
   duration: string;   // Format HH:MM:SS
@@ -99,7 +100,10 @@ export interface Activity {
 
   // Champs imbriqués
   company: Company;
-  instructor: Instructor | null;
+  instructor: Instructor | null ;
+  sport_zen: boolean;
+  instructor_id?: number;
+
 }
 
 // ============================================

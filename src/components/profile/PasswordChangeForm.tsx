@@ -41,7 +41,7 @@ const PasswordChangeForm: React.FC<PasswordChangeFormProps> = ({ userId }) => {
         setSaving(true);
 
         try {
-            await axiosInstance.post('/auth/change-password/', {
+            await axiosInstance.post('/api/users/auth/change-password/', {
                 old_password: oldPassword,
                 new_password: newPassword
             });

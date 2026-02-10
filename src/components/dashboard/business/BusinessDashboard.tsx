@@ -3,13 +3,13 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../../api/axiosInstance';
 import { toast } from 'react-toastify';
-import { Calendar, Users, TrendingUp, DollarSign, Trash2 } from 'lucide-react';
+import { Calendar, Users, TrendingUp, DollarSign, Trash2, Pencil } from 'lucide-react';
 import StatsCard from '../common/StatsCard';
 import {
     LineChart, Line, PieChart, Pie, Cell,
     XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid
 } from 'recharts';
-import type {Activity, User, User as CoachUser} from '../../../types';
+import type {Activity, User, Instructor as CoachUser} from '../../../types';
 import {getMediaUrl} from "../../../utils/media.ts";
 
 interface BusinessDashboardProps {
@@ -31,9 +31,25 @@ const BusinessDashboard: React.FC<BusinessDashboardProps> = ({ user }) => {
                     const { data: activitiesData } = await axiosInstance.get<Activity[]>(`/api/companies/${user.company.id}/activities/`);
                     setActivities(activitiesData);
 
-                    // Récupérer les coaches de l'entreprise
-                    const { data: coachesData } = await axiosInstance.get<CoachUser[]>(`/api/companies/${user.company.id}/coaches/`);
-                    setCoaches(coachesData);
+                    // 1. Extraire les instructeurs des activités
+                    const instructorsFromActivities = activitiesData
+                        .map(activity => activity?.instructor)
+                        // 2. ✅ FILTRER les valeurs null ET s'assurer que ce sont bien des coachs
+                        .filter((instructor): instructor is CoachUser =>
+                            instructor !== null &&
+                            instructor !== undefined &&
+                            instructor.type === 'coach' // On ajoute cette vérification
+                        );
+
+                    // 3. Créer une liste unique de ces instructeurs (cette partie ne change pas)
+                    const uniqueInstructorsMap = new Map<number, CoachUser>();
+                    instructorsFromActivities.forEach(instructor => {
+                        uniqueInstructorsMap.set(instructor.id, instructor);
+                    });
+                    const uniqueInstructors = Array.from(uniqueInstructorsMap.values());
+
+                    // 4. Mettre à jour l'état avec la liste propre des coachs
+                    setCoaches(uniqueInstructors);
                 }
             } catch {
                 toast.error('Erreur lors du chargement des données.');
@@ -49,13 +65,19 @@ const BusinessDashboard: React.FC<BusinessDashboardProps> = ({ user }) => {
         if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette activité ?')) return;
 
         try {
-            await axiosInstance.delete(`/activities/${activityId}/`);
+            await axiosInstance.delete(`/api/activities/${activityId}/`);
             toast.success('Activité supprimée avec succès ✅');
             setActivities(prev => prev.filter(a => a.id !== activityId));
         } catch (error) {
             console.error('Erreur lors de la suppression:', error);
             toast.error('Erreur lors de la suppression de l\'activité ❌');
         }
+    };
+
+    const handleEditActivity = (e: React.MouseEvent, activityId: number) => {
+        e.stopPropagation(); // Empêche la navigation vers le détail de l'activité
+        // Navigue vers une future page de modification (à créer)
+        navigate(`/activities/${activityId}/edit`);
     };
 
     const today = useMemo(() => new Date(), []);
@@ -185,44 +207,67 @@ const BusinessDashboard: React.FC<BusinessDashboardProps> = ({ user }) => {
             </div>
 
             {/* Prochaines activités */}
-            <div className="bg-white rounded-xl p-6 shadow-lg">
-                <h3 className="text-lg font-semibold text-[#0a1128] mb-4">📅 Prochaines activités</h3>
-                {upcoming.length > 0 ? (
-                    <div className="space-y-3">
-                        {upcoming.slice(0, 5).map(activity => (
-                            <div
-                                key={activity.id}
-                                className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-white rounded-lg hover:shadow-md transition-all cursor-pointer group"
-                                onClick={() => navigate(`/activities/${activity.id}`)}
-                            >
-                                <div className="flex-1">
-                                    <p className="font-semibold text-[#0a1128]">{activity.name}</p>
-                                    <p className="text-sm text-gray-600">
-                                        Coach : {activity.instructor?.username || 'Non assigné'}
-                                    </p>
-                                </div>
-                                <div className="flex items-center space-x-6">
-                                    <div className="text-right">
-                                        <p className="text-[#dc5f18] font-semibold">
-                                            {activity.participants_count}/{activity.max_participants}
-                                        </p>
-                                        <p className="text-xs text-gray-500">{activity.price}€</p>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="bg-white rounded-xl p-6 shadow-lg flex flex-col">
+                    <h3 className="text-lg font-semibold text-[#0a1128] mb-4">📅 Prochaines activités</h3>
+                    {upcoming.length > 0 ? (
+                        // ✅ CORRECTION 3 : Conteneur scrollable
+                        <div className="space-y-3  pr-2 flex-1" style={{ maxHeight: '400px' }}>
+                            {/* On retire le .slice() pour tout afficher */}
+                            {upcoming.slice(0, 4).map(activityComing => (
+                                <div key={activityComing.id} className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-white rounded-lg hover:shadow-md transition-all cursor-pointer group" onClick={() => navigate(`/activities/${activityComing.id}`)}>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="font-semibold text-[#0a1128] truncate">{activityComing.name}</p>
+                                        <p className="text-sm text-gray-600">Coach : {activityComing.instructor?.username || 'Non assigné'}</p>
                                     </div>
-                                    <button
-                                        onClick={(e) => handleDeleteActivity(e, activity.id)}
-                                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-all opacity-0 group-hover:opacity-100"
-                                        title="Supprimer l'activité"
-                                    >
-                                        <Trash2 className="w-5 h-5" />
-                                    </button>
+                                    {/* ✅ CORRECTION 4 : Ajout du bouton Modifier */}
+                                    <div className="flex items-center space-x-2 ml-4">
+                                        <div className="text-right">
+                                            <p className="text-[#dc5f18] font-semibold">{activityComing.participants_count}/{activityComing.max_participants}</p>
+                                            <p className="text-xs text-gray-500">{activityComing.price}€</p>
+                                        </div>
+                                        <button onClick={(e) => handleEditActivity(e, activityComing.id)} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all opacity-0 group-hover:opacity-100" title="Modifier l'activité"><Pencil className="w-5 h-5" /></button>
+                                        <button onClick={(e) => handleDeleteActivity(e, activityComing.id)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-all opacity-0 group-hover:opacity-100" title="Supprimer l'activité"><Trash2 className="w-5 h-5" /></button>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <p className="text-gray-500 italic text-center py-8">Aucune activité à venir</p>
-                )}
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-gray-500 italic text-center py-8">Aucune activité à venir</p>
+                    )}
+                </div>
+                <div className="bg-white rounded-xl p-6 shadow-lg flex flex-col">
+                    <h3 className="text-lg font-semibold text-[#0a1128] mb-4">📚 Toutes les activités</h3>
+                    {activities.length > 0 ? (
+                        // ✅ CORRECTION 3 : Conteneur scrollable
+                        <div className="space-y-3 overflow-y-auto pr-2 flex-1" style={{ maxHeight: '400px' }}>
+                            {/* On retire le .slice() pour tout afficher */}
+                            {activities.map(activity => (
+                                <div key={activity.id} className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-white rounded-lg hover:shadow-md transition-all cursor-pointer group" onClick={() => navigate(`/activities/${activity.id}`)}>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="font-semibold text-[#0a1128] truncate">{activity.name}</p>
+                                        <p className="text-sm text-gray-600">Coach : {activity.instructor?.username || 'Non assigné'}</p>
+                                    </div>
+                                    {/* ✅ CORRECTION 4 : Ajout du bouton Modifier */}
+                                    <div className="flex items-center space-x-2 ml-4">
+                                        <div className="text-right">
+                                            <p className="text-[#dc5f18] font-semibold">{activity.participants_count}/{activity.max_participants}</p>
+                                            <p className="text-xs text-gray-500">{activity.price}€</p>
+                                        </div>
+                                        <button onClick={(e) => handleEditActivity(e, activity.id)} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-all opacity-0 group-hover:opacity-100" title="Modifier l'activité"><Pencil className="w-5 h-5" /></button>
+                                        <button onClick={(e) => handleDeleteActivity(e, activity.id)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-all opacity-0 group-hover:opacity-100" title="Supprimer l'activité"><Trash2 className="w-5 h-5" /></button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-gray-500 italic text-center py-8">Aucune activité enregistrée</p>
+                    )}
+                </div>
+
             </div>
+
 
             {/* Coaches */}
             <div className="bg-white rounded-xl p-6 shadow-lg">
@@ -242,17 +287,7 @@ const BusinessDashboard: React.FC<BusinessDashboardProps> = ({ user }) => {
                                     alt={coach.username}
                                     className="w-12 h-12 rounded-full object-cover"
                                 />
-                                <img
-                                    src={coach.avatar ? getMediaUrl(coach.avatar) : '/avatar1.png'}
-                                    alt={coach.username}
-                                    className="w-full h-64 object-cover"
-                                    onError={(event) => {
-                                        const target = event.currentTarget;
-                                        if (target.src.includes('avatar1.png')) return;
-                                        target.src = '/avatar1.png';
-                                        target.onerror = null;
-                                    }}
-                                />
+
                                 <div>
                                     <p className="font-semibold text-[#0a1128]">{coach.username}</p>
                                     <p className="text-xs text-gray-500">{coach.email}</p>

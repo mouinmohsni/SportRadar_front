@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {useParams} from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
-import {getImageUrl, getMediaUrl} from '../utils/media';
+import { getMediaUrl} from '../utils/media';
 import type {Activity, Company, User} from '../types';
 import SEO from '../components/SEO';
 
@@ -207,32 +207,25 @@ const CoachDetailPage: React.FC = () => {
                                 >
                                     {/* Image de l'activité */}
 
-                                    <img
-                                        // On essaie de charger l'image de l'API.
-                                        src={activity.image ? getImageUrl(activity.image) : '/activity-default11.jpeg'}
-                                        alt={activity.name}
-                                        className="w-full h-48 object-cover"
+                                    <div className="relative">
+                                        <img
+                                            src={getMediaUrl(activity.image) || '/images/activity-default.jpg'} // Assurez-vous que ce chemin est correct
+                                            alt={activity.name}
+                                            className="w-full h-48 object-cover"
+                                            onError={(event) => {
+                                                const target = event.currentTarget;
+                                                if (target.src.includes('activity-default')) return;
+                                                target.src = '/images/activity-default.jpg'; // Chemin de secours
+                                                target.onerror = null;
+                                            }}
+                                        />
 
-                                        // Si le chargement échoue...
-                                        onError={(event) => {
-                                            const target = event.currentTarget;
-
-                                            // ✅ SÉCURITÉ ANTI-BOUCLE :
-                                            // On vérifie si on n'a pas déjà essayé de mettre l'image par défaut.
-                                            // Si la source est déjà l'image par défaut, on arrête tout.
-                                            if (target.src.includes('activity-default11.jpeg')) {
-                                                return; // Sort de la fonction pour éviter la boucle
-                                            }
-
-                                            // On remplace la source de l'image par notre image de secours.
-                                            // Assurez-vous que le nom du fichier est EXACTEMENT correct.
-                                            target.src = '/activity-default11.jpeg';
-
-                                            // Optionnel mais propre : on désactive l'événement onError pour cet élément
-                                            // une fois qu'il a été déclenché, pour être sûr à 100%.
-                                            target.onerror = null;
-                                        }}
-                                    />
+                                        {activity.sport_zen && (
+                                            <div className="absolute top-2 right-2 bg-gradient-to-r from-green-400 to-blue-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md">
+                                                🧘 Sport Zen
+                                            </div>
+                                        )}
+                                    </div>
 
 
                                     <div className="p-5">

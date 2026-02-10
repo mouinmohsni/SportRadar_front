@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, MapPin, Star } from 'lucide-react';
 import axiosInstance from '../api/axiosInstance';
-import { Helmet } from 'react-helmet-async';
+import SEO from "../components/SEO.tsx";
 
 interface Place {
     id: number;
@@ -28,11 +28,8 @@ const BadgePage: React.FC = () => {
 
     return (
         <>
-            <Helmet>
-                <title>Badge SportZen - SportRadar</title>
-                <meta name="description" content="Découvrez les lieux bienveillants certifiés pour une pratique sportive sereine." />
-                <meta name="robots" content="index, follow" />
-            </Helmet>
+
+            <SEO title={"Badge SportZen - SportRadar"} description={"Découvrez les lieux bienveillants certifiés pour une pratique sportive sereine."}/>
 
             <div className="min-h-screen bg-[#C7C5C5] flex flex-col items-center">
                 <div className="max-w-6xl mx-auto">

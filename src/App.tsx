@@ -48,6 +48,7 @@ import CoachDetailPage from "./pages/CoachDetailPage.tsx";
 import CompanyDetailPage from "./pages/CompanyDetailPage.tsx";
 import CompaniesPage from "./pages/CompaniesPage.tsx";
 import CoachesPage from "./pages/CoachesPage.tsx";
+import ActivityUpdate from "./pages/ActivityUpdate.tsx";
 
 function App() {
   return (
@@ -81,8 +82,10 @@ function App() {
               {/* Business-only */}
               <Route path="/activities/new" element={<PrivateRoute><BusinessRoute><AddActivityPage /></BusinessRoute></PrivateRoute>} />
               <Route path="/admin/activities" element={<PrivateRoute><BusinessRoute><AdminActivitiesPage /></BusinessRoute></PrivateRoute>} />
+              <Route path="/activities/:id/edit" element={<PrivateRoute><BusinessRoute><ActivityUpdate /></BusinessRoute></PrivateRoute>} />
 
-              {/* Admin-only BackOffice */}
+
+              {/* Admin-only BackOffice  ActivityUpdate*/}
               <Route path="/admin" element={<PrivateRoute><AdminRoute><AdminBackOffice /></AdminRoute></PrivateRoute>} />
 
               {/* Feature detail pages */}

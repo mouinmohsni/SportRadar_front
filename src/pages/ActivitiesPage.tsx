@@ -3,7 +3,7 @@ import {Link, useNavigate} from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
 import {useAuth} from '../contexts/AuthContext';
 import CountUp from 'react-countup';
-import {getImageUrl} from '../utils/media.ts'
+import {getMediaUrl} from '../utils/media.ts'
 import {
     MapPin,
     Calendar as CalendarIcon,
@@ -43,6 +43,7 @@ const ActivitiesPage: React.FC = () => {
     const [locationFilter, setLocationFilter] = useState('');
     const [dateFilter, setDateFilter] = useState('');
     const [selectedLevel, setSelectedLevel] = useState<string>('');
+    const [sportZenFilter, setSportZenFilter] = useState<boolean | null>(null);
 
     useEffect(() => {
         const fetchActivitiesAndBookings = async () => {
@@ -72,22 +73,30 @@ const ActivitiesPage: React.FC = () => {
     }, [isAuthenticated]);
 
     const filtered = useMemo(() => {
+        // ... la logique de filtrage à l'intérieur ne change pas ...
         return activities
-            .filter(a => {
+            .filter(activity => {
                 if (searchTerm) {
                     const lowercasedSearchTerm = searchTerm.toLowerCase();
-                    const nameMatches = a.name.toLowerCase().includes(lowercasedSearchTerm);
-                    const descriptionMatches = a.description ? a.description.toLowerCase().includes(lowercasedSearchTerm) : false;
+                    const nameMatches = activity.name.toLowerCase().includes(lowercasedSearchTerm);
+                    const descriptionMatches = activity.description ? activity.description.toLowerCase().includes(lowercasedSearchTerm) : false;
                     if (!nameMatches && !descriptionMatches) {
                         return false;
                     }
                 }
-                if (categoryFilter && a.category !== categoryFilter) return false;
-                if (locationFilter && a.effective_location !== locationFilter) return false;
-                return !(dateFilter && !a.start_time.startsWith(dateFilter));
+                if (categoryFilter && activity.category !== categoryFilter) return false;
+                if (locationFilter && activity.effective_location !== locationFilter) return false;
+
+                // Cette logique est correcte, le problème n'était pas ici
+                if (sportZenFilter !== null && activity.sport_zen !== sportZenFilter) {
+                    return false;
+                }
+
+                return !(dateFilter && !activity.start_time.startsWith(dateFilter));
             })
             .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
-    }, [activities, searchTerm, categoryFilter, locationFilter, dateFilter]);
+    }, [activities, searchTerm, categoryFilter, locationFilter, dateFilter, sportZenFilter]); // ✅ AJOUTEZ sportZenFilter ICI
+
 
     const displayed = showAll
         ? filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
@@ -231,6 +240,15 @@ const ActivitiesPage: React.FC = () => {
                             onChange={e => setDateFilter(e.target.value)}
                             className="p-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#dc5f18]"
                         />
+                        <select
+                            value={sportZenFilter === null ? '' : sportZenFilter.toString()}
+                            onChange={e => setSportZenFilter(e.target.value === '' ? null : e.target.value === 'true')}
+                            className="p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#dc5f18]"
+                        >
+                            <option value="">Toutes les salles</option>
+                            <option value="true">🧘 Sport Zen uniquement</option>
+                            <option value="false">Salles standard</option>
+                        </select>
                     </div>
 
                     {/* Compteur de résultats */}
@@ -245,34 +263,26 @@ const ActivitiesPage: React.FC = () => {
                             const isReg = registrations.has(act.id);
                             return (
                                 <div key={act.id}
-                                     className="bg-white rounded-2xl shadow-lg flex flex-col overflow-hidden hover:shadow-2xl transition-shadow">
-                                    {/* ✅ Image avec fallback */}
-                                    <img
-                                        // On essaie de charger l'image de l'API.
-                                        src={act.image ? getImageUrl(act.image) : '/activity-default11.jpeg'}
-                                        alt={act.name}
-                                        className="w-full h-48 object-cover"
+                                     className="bg-white rounded-2xl shadow-lg flex flex-col overflow-hidden hover:shadow-2xl transition-shadow">                                    {/* ✅ Image avec fallback */}
+                                    <div className="relative">
+                                        <img
+                                            src={getMediaUrl(act.image) || '/images/activity-default.jpg'} // Assurez-vous que ce chemin est correct
+                                            alt={act.name}
+                                            className="w-full h-48 object-cover"
+                                            onError={(event) => {
+                                                const target = event.currentTarget;
+                                                if (target.src.includes('activity-default')) return;
+                                                target.src = '/images/activity-default.jpg'; // Chemin de secours
+                                                target.onerror = null;
+                                            }}
+                                        />
 
-                                        // Si le chargement échoue...
-                                        onError={(event) => {
-                                            const target = event.currentTarget;
-
-                                            // ✅ SÉCURITÉ ANTI-BOUCLE :
-                                            // On vérifie si on n'a pas déjà essayé de mettre l'image par défaut.
-                                            // Si la source est déjà l'image par défaut, on arrête tout.
-                                            if (target.src.includes('activity-default11.jpeg')) {
-                                                return; // Sort de la fonction pour éviter la boucle
-                                            }
-
-                                            // On remplace la source de l'image par notre image de secours.
-                                            // Assurez-vous que le nom du fichier est EXACTEMENT correct.
-                                            target.src = '/activity-default11.jpeg';
-
-                                            // Optionnel mais propre : on désactive l'événement onError pour cet élément
-                                            // une fois qu'il a été déclenché, pour être sûr à 100%.
-                                            target.onerror = null;
-                                        }}
-                                    />
+                                        {act.sport_zen && (
+                                            <div className="absolute top-2 right-2 bg-gradient-to-r from-green-400 to-blue-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md">
+                                                🧘 Sport Zen
+                                            </div>
+                                        )}
+                                    </div>
                                     <div className="p-4 flex-1 flex flex-col justify-between">
                                         <div>
                                             <div className="flex justify-between items-center mb-2">

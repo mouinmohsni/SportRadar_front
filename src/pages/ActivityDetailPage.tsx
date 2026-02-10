@@ -9,6 +9,7 @@ import { getMediaUrl } from '../utils/media'; // Assurez-vous que cette fonction
 import { useAuth } from '../contexts/AuthContext';
 import axios from "axios";
 import SEO from "../components/SEO.tsx";
+import {toast} from "react-toastify";
 
 interface ReviewPayload {
     activity: number;
@@ -30,6 +31,7 @@ const ActivityDetailPage: React.FC = () => {
     const [newComment, setNewComment] = useState('');
     const [newScore, setNewScore] = useState(0);
     const [isReviewSubmitting, setIsReviewSubmitting] = useState(false);
+
 
     useEffect(() => {
         // ... (le useEffect ne change pas)
@@ -152,6 +154,26 @@ const ActivityDetailPage: React.FC = () => {
         }
     };
 
+    const handleEditActivity = (e: React.MouseEvent, activityId: number) => {
+        e.stopPropagation(); // Empêche la navigation vers le détail de l'activité
+        // Navigue vers une future page de modification (à créer)
+        navigate(`/activities/${activityId}/edit`);
+    };
+
+    const handleDeleteActivity = async (e: React.MouseEvent, activityId: number) => {
+        e.stopPropagation(); // Empêche la navigation vers le détail de l'activité
+        if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette activité ?')) return;
+
+        try {
+            await axiosInstance.delete(`/api/activities/${activityId}/`);
+            toast.success('Activité supprimée avec succès ✅');
+            navigate('/activities');
+        } catch (error) {
+            console.error('Erreur lors de la suppression:', error);
+            toast.error('Erreur lors de la suppression de l\'activité ❌');
+        }
+    };
+
 
     const { date, time } = {
         date: new Date(activity.start_time).toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
@@ -171,17 +193,25 @@ const ActivityDetailPage: React.FC = () => {
                 <div className="max-w-4xl mx-auto">
                     <div className="bg-white rounded-lg shadow-xl overflow-hidden">
                         {/* CORRECTION 1: Une seule balise <img> pour l'image principale avec la logique de secours */}
-                        <img
-                            src={activity.image ? getMediaUrl(activity.image) : '/activity-default11.jpeg'}
-                            alt={activity.name}
-                            className="w-full h-64 object-cover"
-                            onError={(event) => {
-                                const target = event.currentTarget;
-                                if (target.src.includes('activity-default11.jpeg')) return;
-                                target.src = '/activity-default11.jpeg';
-                                target.onerror = null;
-                            }}
-                        />
+                        <div className="relative">
+                            <img
+                                src={getMediaUrl(activity.image) || '/images/activity-default.jpg'} // Assurez-vous que ce chemin est correct
+                                alt={activity.name}
+                                className="w-full h-48 object-cover"
+                                onError={(event) => {
+                                    const target = event.currentTarget;
+                                    if (target.src.includes('activity-default')) return;
+                                    target.src = '/images/activity-default.jpg'; // Chemin de secours
+                                    target.onerror = null;
+                                }}
+                            />
+
+                            {activity.sport_zen && (
+                                <div className="absolute top-2 right-2 bg-gradient-to-r from-green-400 to-blue-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md">
+                                    🧘 Sport Zen
+                                </div>
+                            )}
+                        </div>
 
                         <div className="p-8">
                             {/* ... (Le reste du contenu de la description ne change pas) */}
@@ -229,30 +259,79 @@ const ActivityDetailPage: React.FC = () => {
                             </div>
 
                             <div className="mt-8 border-t pt-6 flex justify-end">
-                                {user?.type === 'personal' ? (
-                                <button
-                                    onClick={handleRegisterClick}
-                                    disabled={isSubmitting || (isFull && !isRegistered)}
-                                    className={`font-bold py-3 px-6 rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed
-                                        ${isRegistered
-                                        ? 'bg-gray-500 text-white hover:bg-gray-600'
-                                        : isFull
-                                            ? 'bg-red-300 text-red-800'
-                                            : 'bg-[#dc5f18] text-white hover:brightness-110'
+                                {(() => {
+                                    // Cas 1 : L'utilisateur est un client ('personal')
+                                    if (user?.type === 'personal') {
+                                        return (
+                                            <button
+                                                onClick={handleRegisterClick}
+                                                disabled={isSubmitting || (isFull && !isRegistered)}
+                                                className={`font-bold py-3 px-6 rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed
+                        ${isRegistered
+                                                    ? 'bg-gray-500 text-white hover:bg-gray-600'
+                                                    : isFull
+                                                        ? 'bg-red-300 text-red-800'
+                                                        : 'bg-[#dc5f18] text-white hover:brightness-110'
+                                                }
+                    `}
+                                            >
+                                                {isSubmitting
+                                                    ? 'Chargement...'
+                                                    : isRegistered
+                                                        ? 'Se désinscrire'
+                                                        : isFull
+                                                            ? 'Complet'
+                                                            : `S'inscrire ( ${activity.price} € )`
+                                                }
+                                            </button>
+                                        );
                                     }
-                                    `}
-                                >
-                                    {isSubmitting
-                                        ? 'Chargement...'
-                                        : isRegistered
-                                            ? 'Se désinscrire'
-                                            : isFull
-                                                ? 'Complet'
-                                                : `S'inscrire ( ${activity.price} € )`
+
+                                    // Cas 2 : L'utilisateur est un propriétaire d'entreprise ('business') ET
+                                    // l'activité appartient à son entreprise.
+                                    if (user?.type === 'business' && user.company?.id === activity.company?.id) {
+                                        return (
+                                            <div className="flex items-center justify-end space-x-4">
+
+                                                {/* --- BOUTON MODIFIER --- */}
+                                                <button
+                                                    type="button" // ✅ Important pour éviter la soumission accidentelle d'un formulaire
+                                                    onClick={(e) => handleEditActivity(e, activity.id)}
+                                                    className="
+            font-bold py-3 px-6 rounded-lg
+            bg-[#dc5f18] text-white
+            hover:bg-opacity-90 transition-all transform hover:scale-105
+            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#dc5f18]
+        "
+                                                >
+                                                    Modifier l'activité
+                                                </button>
+
+                                                {/* --- BOUTON SUPPRIMER (avec une couleur plus distinctive et dangereuse) --- */}
+                                                <button
+                                                    type="button" // ✅ Important
+                                                    onClick={(e) => handleDeleteActivity(e, activity.id)}
+                                                    className="
+            font-bold py-3 px-6 rounded-lg
+            bg-red-600 text-white  // 🎨 Couleur rouge pour indiquer une action destructive
+            hover:bg-red-700 transition-all transform hover:scale-105
+            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500
+        "
+                                                >
+                                                    Supprimer l'activité
+                                                </button>
+
+                                            </div>
+                                        );
                                     }
-                                </button>
-                                ):(<div></div>)}
+
+                                    // Cas 3 (par défaut) : Pour tous les autres utilisateurs (coachs, visiteurs non connectés, etc.)
+                                    // On n'affiche aucun bouton d'action.
+                                    return null;
+
+                                })()}
                             </div>
+
                         </div>
 
                         <div className="p-8 border-t">

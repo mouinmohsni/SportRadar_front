@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
-import type { Activity, User } from '../types';
+import type { Activity,Instructor as CoachUser } from '../types';
 import { getMediaUrl } from '../utils/media';
 
 // Importation des icônes pour un design plus riche
@@ -28,7 +28,7 @@ const CompanyDetailPage: React.FC = () => {
     // 1. Récupération de l'ID de la salle de sport depuis l'URL
     const { id } = useParams<{ id: string }>();
     const [company, setCompany] = useState<Company | null>(null);
-    const [coaches, setCoaches] = useState<User[]>([]);
+    const [coaches, setCoaches] = useState<CoachUser[]>([]);
     const [activities, setActivities] = useState<Activity[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -44,17 +44,31 @@ const CompanyDetailPage: React.FC = () => {
         // ✅ Faire 3 appels API en parallèle
         Promise.all([
             axiosInstance.get<Company>(`/api/companies/${id}/`),
-            axiosInstance.get<User[]>(`/api/companies/${id}/coaches/`),
+
             axiosInstance.get<Activity[]>(`/api/companies/${id}/activities/`)
         ])
-            .then(([companyResponse, coachesResponse, activitiesResponse]) => {
+            .then(([companyResponse, activitiesResponse]) => {
                 setCompany(companyResponse.data);
-                setCoaches(coachesResponse.data);
                 setActivities(activitiesResponse.data);
 
-                console.log("companyResponse.data= ",companyResponse.data)
-                console.log("coachesResponse.data== ",coachesResponse.data)
-                console.log("activitiesResponse.data === ",activitiesResponse.data)
+                const instructorsFromActivities = activitiesResponse.data
+                    .map(activity => activity?.instructor)
+                    // 2. ✅ FILTRER les valeurs null ET s'assurer que ce sont bien des coachs
+                    .filter((instructor): instructor is CoachUser =>
+                        instructor !== null &&
+                        instructor !== undefined &&
+                        instructor.type === 'coach' // On ajoute cette vérification
+                    );
+
+                // 3. Créer une liste unique de ces instructeurs (cette partie ne change pas)
+                const uniqueInstructorsMap = new Map<number, CoachUser>();
+                instructorsFromActivities.forEach(instructor => {
+                    uniqueInstructorsMap.set(instructor.id, instructor);
+                });
+                const uniqueInstructors = Array.from(uniqueInstructorsMap.values());
+
+                // 4. Mettre à jour l'état avec la liste propre des coachs
+                setCoaches(uniqueInstructors);
 
             })
             .catch(err => {
@@ -84,7 +98,7 @@ const CompanyDetailPage: React.FC = () => {
     }
 
     // ✅ Helper pour afficher le nom complet d'un coach
-    const getCoachDisplayName = (coach: User): string => {
+    const getCoachDisplayName = (coach: CoachUser): string => {
         if (coach.first_name && coach.last_name) {
             return `${coach.first_name} ${coach.last_name}`;
         }

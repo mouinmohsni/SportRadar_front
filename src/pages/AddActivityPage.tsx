@@ -20,7 +20,7 @@ interface ActivityForm {
   venue: string; // Nouveau champ, correspond aux choix du modèle Django
   sport_zen: boolean;
   image: File | null;
-  instructor: number | ''; // ID de l'instructeur
+  instructor_id: number | ''; // ID de l'instructeur
   is_public: boolean; // Nouveau champ, correspond au modèle Django
 }
 
@@ -44,7 +44,7 @@ const AddActivityPage: React.FC = () => {
     venue: 'indoor', // Correspond à VenueChoices.INDOOR
     sport_zen: false,
     image: null,
-    instructor: '',
+    instructor_id: '',
     is_public: true, // Par défaut, une activité est publique
   });
 
@@ -129,7 +129,6 @@ const AddActivityPage: React.FC = () => {
       formData.append('start_time', fullStartTime);
     }
 
-    console.log("FormData content:");
     for (const pair of formData.entries()) {
       console.log(`${pair[0]}: ${pair[1]}`);
     }
@@ -141,7 +140,7 @@ const AddActivityPage: React.FC = () => {
         },
       });
       toast.success('Activité créée avec succès ✅');
-      navigate('/api/activities');
+      navigate('/activities');
     } catch (error: any) {
       console.error('Erreur lors de l\'enregistrement de l\'activité:', error.response?.data || error.message);
       toast.error("Erreur lors de l'enregistrement ❌");
@@ -334,9 +333,9 @@ const AddActivityPage: React.FC = () => {
           <div>
             <label htmlFor="instructor" className="block text-sm font-medium text-gray-700">Instructeur</label>
             <select
-                id="instructor"
-                name="instructor"
-                value={activity.instructor}
+                id="instructor_id"
+                name="instructor_id"
+                value={activity.instructor_id}
                 onChange={handleChange}
                 className="mt-1 block w-full input-field"
                 required
