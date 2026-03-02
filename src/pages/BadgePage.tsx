@@ -40,7 +40,7 @@ const BadgePage: React.FC = () => {
                         transition={{ duration: 0.8 }}
                         className="w-full bg-gradient-to-b from-[#0a1128] to-[#ABC2D7] flex flex-col items-center text-center pt-20 pb-16 px-4"
                     >
-                        <Shield className="w-16 h-16 text-[#dc5f18] mb-4" />
+                        <Shield className="w-16 h-16 text-[#c44d00] mb-4" />
                         <h1 className="text-4xl lg:text-5xl font-extrabold text-white mb-2">
                             Badge SportZen
                         </h1>
@@ -64,7 +64,7 @@ const BadgePage: React.FC = () => {
                                 { step: 4, title: 'Suivi', desc: 'Renouvelez-le chaque année.' },
                             ].map(({ step, title, desc }) => (
                                 <div key={step} className="flex flex-col items-center text-center space-y-4">
-                                    <div className="w-12 h-12 flex items-center justify-center bg-[#dc5f18] text-white rounded-full text-xl font-bold">
+                                    <div className="w-12 h-12 flex items-center justify-center bg-[#c44d00] text-white rounded-full text-xl font-bold">
                                         {step}
                                     </div>
                                     <h3 className="text-xl font-semibold text-[#0a1128]">{title}</h3>
@@ -109,7 +109,7 @@ const BadgePage: React.FC = () => {
                                                 </div>
                                                 <div className="flex">
                                                     {Array.from({ length: Math.round(place.rating) }).map((_, i) => (
-                                                        <Star key={i} className="w-5 h-5 text-[#dc5f18]" />
+                                                        <Star key={i} className="w-5 h-5 text-[#c44d00]" />
                                                     ))}
                                                 </div>
                                             </div>
@@ -128,7 +128,7 @@ const BadgePage: React.FC = () => {
                         {/* onClick={() => navigate('/corporate-offers')} */}
                         <button
                             disabled
-                            className="bg-[#dc5f18]/50 text-white px-8 py-4 rounded-xl text-lg font-semibold cursor-not-allowed transition relative group"
+                            className="bg-[#c44d00]/50 text-white px-8 py-4 rounded-xl text-lg font-semibold cursor-not-allowed transition relative group"
                             title="Cette fonctionnalité sera bientôt disponible"
                         >
                             Badge SportZen en construction

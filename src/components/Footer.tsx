@@ -74,7 +74,7 @@ const Footer: React.FC = () => {
             </a>
             <span>|</span>
             <a href="/sitemap" className="hover:text-[#0a1128] transition-colors">
-              SiteMap
+              Plan du site
             </a>
 
             <span>|</span>

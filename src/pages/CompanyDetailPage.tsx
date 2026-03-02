@@ -115,8 +115,9 @@ const CompanyDetailPage: React.FC = () => {
     return (
         <>
             <SEO
-            title={company.name}
-            description={company.description || `${company.name} - Salle de sport à ${company.city}. Découvrez nos ${activities.length} activités sportives et notre équipe de ${coaches.length} coachs professionnels. Réservez votre séance dès maintenant !`}
+                title={`${company.name} | Salle de Sport & Fitness sur SportRadar`}
+                description={`Découvrez ${company.name} à ${company.address}. Profitez d'équipements de qualité, de cours collectifs et réservez votre séance directement sur SportRadar !`}
+                keywords={`${company.name}, salle de sport ${company.address}, club fitness, studio yoga, réserver séance sport, ${company.name} sportradar`}
             />
 
             <div className="min-h-screen bg-gray-50">

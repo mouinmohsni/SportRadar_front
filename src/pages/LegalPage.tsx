@@ -35,7 +35,7 @@ const LegalPage: React.FC = () => {
                         <p className="text-gray-700">
                             Vercel Inc.<br />
                             340 S Lemon Ave #4133, Walnut, CA 91789, USA<br />
-                            Site : <a href="https://vercel.com" className="text-[#dc5f18] hover:underline">vercel.com</a>
+                            Site : <a href="https://vercel.com" className="text-[#c44d00] hover:underline">vercel.com</a>
                         </p>
                     </section>
 
@@ -53,7 +53,7 @@ const LegalPage: React.FC = () => {
                         <h2 className="text-2xl font-semibold text-[#0a1128] mb-2">Données personnelles</h2>
                         <p className="text-gray-700">
                             Conformément à la loi « Informatique et Libertés » du 6 janvier 1978 modifiée et au RGPD, vous disposez d’un droit d’accès, de rectification et de suppression des données qui vous concernent.
-                            Pour l’exercer, contactez-nous à l’adresse : <a href="mailto:contact@sportradar.com" className="text-[#dc5f18] hover:underline">contact@sportradar.com</a>.
+                            Pour l’exercer, contactez-nous à l’adresse : <a href="mailto:contact@sportradar.com" className="text-[#c44d00] hover:underline">contact@sportradar.com</a>.
                         </p>
                     </section>
 
@@ -104,7 +104,7 @@ const LegalPage: React.FC = () => {
 
                     {/* Retour à l’accueil */}
                     <div className="text-center">
-                        <Link to="/" className="text-[#dc5f18] hover:underline font-semibold">
+                        <Link to="/" className="text-[#c44d00] hover:underline font-semibold">
                             ← Retour à l’accueil
                         </Link>
                     </div>

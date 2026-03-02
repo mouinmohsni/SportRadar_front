@@ -195,9 +195,12 @@ const ActivitiesPage: React.FC = () => {
 
     return (
         <>
+
+
             <SEO
-                title="Toutes les Activités - Réservez votre séance"
-                description="Parcourez, filtrez et trouvez l'activité sportive parfaite pour vous parmi notre sélection. Réservez votre place en quelques clics et commencez votre parcours bien-être."
+                title="Réservez vos Activités Sportives et Fitness | SportRadar"
+                description="Trouvez et réservez facilement vos séances de Yoga, Fitness, Boxe ou Natation près de chez vous. Découvrez des centaines d'activités sportives avec SportRadar !"
+                keywords="réservation sport, séance yoga, cours fitness, club de boxe, natation, sport en ligne, activités sportives locales, bien-être"
             />
 
             <div className="min-h-screen bg-[#C7C5C5] py-10 px-4">
@@ -212,12 +215,12 @@ const ActivitiesPage: React.FC = () => {
                             placeholder="Recherche libre..."
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
-                            className="p-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#dc5f18]"
+                            className="p-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#c44d00]"
                         />
                         <select
                             value={categoryFilter}
                             onChange={e => setCategoryFilter(e.target.value)}
-                            className="p-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#dc5f18]"
+                            className="p-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#c44d00]"
                         >
                             <option value="">Toutes catégories</option>
                             {[...new Set(activities.map(a => a.category))].map(c => (
@@ -227,7 +230,7 @@ const ActivitiesPage: React.FC = () => {
                         <select
                             value={locationFilter}
                             onChange={e => setLocationFilter(e.target.value)}
-                            className="p-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#dc5f18]"
+                            className="p-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#c44d00]"
                         >
                             <option value="">Tous lieux</option>
                             {[...new Set(activities.map(a => a.effective_location))].map(l => (
@@ -238,12 +241,12 @@ const ActivitiesPage: React.FC = () => {
                             type="date"
                             value={dateFilter}
                             onChange={e => setDateFilter(e.target.value)}
-                            className="p-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#dc5f18]"
+                            className="p-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#c44d00]"
                         />
                         <select
                             value={sportZenFilter === null ? '' : sportZenFilter.toString()}
                             onChange={e => setSportZenFilter(e.target.value === '' ? null : e.target.value === 'true')}
-                            className="p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#dc5f18]"
+                            className="p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#c44d00]"
                         >
                             <option value="">Toutes les salles</option>
                             <option value="true">🧘 Sport Zen uniquement</option>
@@ -252,9 +255,9 @@ const ActivitiesPage: React.FC = () => {
                     </div>
 
                     {/* Compteur de résultats */}
-                    <p className="text-gray-600 mb-4">
+                    <h2 className="text-gray-600 mb-4">
                         {filtered.length} activité{filtered.length > 1 ? 's' : ''} trouvée{filtered.length > 1 ? 's' : ''}
-                    </p>
+                    </h2>
 
                     {/* Grille des activités */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
@@ -287,11 +290,11 @@ const ActivitiesPage: React.FC = () => {
                                         <div>
                                             <div className="flex justify-between items-center mb-2">
                                                 <Link to={`/activities/${act.id}`}
-                                                      className="hover:text-[#dc5f18] transition-colors">
+                                                      className="hover:text-[#c44d00] transition-colors">
                                                     <h2 className="text-xl font-semibold text-[#0a1128]">{act.name}</h2>
                                                 </Link>
                                                 {act.average_score && (
-                                                    <div className="flex items-center space-x-1 text-[#dc5f18]">
+                                                    <div className="flex items-center space-x-1 text-[#c44d00]">
                                                         <Star className="w-4 h-4 fill-current"/>
                                                         <span className="font-semibold">{act.average_score}</span>
                                                     </div>
@@ -307,7 +310,7 @@ const ActivitiesPage: React.FC = () => {
                                                         <UserIcon className="w-4 h-4"/>
                                                         <Link
                                                             to={`/coaches/${act.instructor.id}`}
-                                                            className="hover:text-[#dc5f18] transition-colors"
+                                                            className="hover:text-[#c44d00] transition-colors"
                                                         >
                                                             {getCoachDisplayName(act.instructor)}
                                                         </Link>
@@ -348,7 +351,7 @@ const ActivitiesPage: React.FC = () => {
                                                         ? 'bg-[#ABC2D7] text-[#0a1128] hover:bg-[#9ab0c5]'
                                                         : isFull
                                                             ? 'bg-gray-200 text-gray-600 cursor-not-allowed'
-                                                            : 'bg-[#dc5f18] text-white hover:bg-[#b84f14]'
+                                                            : 'bg-[#c44d00] text-white hover:bg-[#b84f14]'
                                                 }`}
                                             >
                                                 {isReg ? 'Se désinscrire' : isFull ? 'Complet' : "S'inscrire"}
@@ -431,7 +434,7 @@ const ActivitiesPage: React.FC = () => {
                                     <XAxis dataKey="month"/>
                                     <YAxis/>
                                     <RechartsTooltip/>
-                                    <Line type="monotone" dataKey="count" stroke="#dc5f18" strokeWidth={2}/>
+                                    <Line type="monotone" dataKey="count" stroke="#c44d00" strokeWidth={2}/>
                                 </LineChart>
                             </ResponsiveContainer>
                         </div>

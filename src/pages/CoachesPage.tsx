@@ -113,8 +113,9 @@ const CoachesPage: React.FC = () => {
     return (
         <>
             <SEO
-                title="Tous les Coachs Sportifs"
-                description={`Découvrez ${coaches.length} coachs sportifs professionnels. Trouvez le coach idéal pour vos objectifs et consultez leurs activités et disponibilités.`}
+                title="Nos Coaches Sportifs et Experts Bien-être | SportRadar"
+                description="Trouvez le coach idéal pour atteindre vos objectifs santé et fitness. Yoga, Boxe, Musculation ou Cardio : nos experts certifiés vous accompagnent avec SportRadar !"
+                keywords="coach sportif, entraîneur personnel, coaching bien-être, expert fitness, yoga coach, musculation, accompagnement sportif, sportradar"
             />
 
             <div className="min-h-screen bg-[#C7C5C5] py-10 px-4">
@@ -154,9 +155,9 @@ const CoachesPage: React.FC = () => {
                     </div>
 
                     {/* Compteur de résultats */}
-                    <p className="text-gray-600 mb-4">
+                    <h2 className="text-gray-600 mb-4">
                         {filtered.length} coach{filtered.length > 1 ? 'es' : ''} trouvé{filtered.length > 1 ? 's' : ''}
-                    </p>
+                    </h2>
 
                     {/* Grille des coaches */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">

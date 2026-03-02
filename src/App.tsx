@@ -49,6 +49,7 @@ import CompanyDetailPage from "./pages/CompanyDetailPage.tsx";
 import CompaniesPage from "./pages/CompaniesPage.tsx";
 import CoachesPage from "./pages/CoachesPage.tsx";
 import ActivityUpdate from "./pages/ActivityUpdate.tsx";
+import ServicesPage from "./pages/ServicesPage.tsx";
 
 function App() {
   return (
@@ -71,6 +72,8 @@ function App() {
               <Route path="/companies/:id" element={<CompanyDetailPage />} />
               <Route path="/companies" element={<CompaniesPage />} />
               <Route path="/coaches" element={<CoachesPage />} />
+
+              <Route path="/services" element={<ServicesPage/>} />
 
               {/* B2C Authenticated */}
               <Route path="/dashboard" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />

@@ -23,7 +23,7 @@ const DashboardPage: React.FC = () => {
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#C7C5C5]">
           <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-4 border-[#dc5f18] mb-4"></div>
+            <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-4 border-[#c44d00] mb-4"></div>
             <p className="text-xl text-gray-700">Chargement de votre espace...</p>
           </div>
         </div>

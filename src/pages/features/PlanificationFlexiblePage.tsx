@@ -23,7 +23,7 @@ const PlanificationFlexiblePage: React.FC = () => {
                 {/* Bouton Retour */}
                 <button
                     onClick={() => navigate(-1)}
-                    className="flex items-center text-[#0a1128] hover:text-[#dc5f18] transition"
+                    className="flex items-center text-[#0a1128] hover:text-[#c44d00] transition"
                 >
                     <ArrowLeft className="w-5 h-5 mr-2" />
                     <span>Retour</span>
@@ -31,7 +31,7 @@ const PlanificationFlexiblePage: React.FC = () => {
 
                 {/* En-tête */}
                 <div className="flex items-center space-x-4">
-                    <div className="p-3 bg-[#dc5f18] rounded-md">
+                    <div className="p-3 bg-[#c44d00] rounded-md">
                         <CalendarIcon className="w-6 h-6 text-white" />
                     </div>
                     <h1 className="text-3xl font-bold text-[#0a1128]">Planification flexible</h1>
@@ -47,7 +47,7 @@ const PlanificationFlexiblePage: React.FC = () => {
                 <ul className="list-disc list-inside space-y-2">
                     {planificationDetails.map((item, idx) => (
                         <li key={idx} className="flex items-start space-x-2">
-                            <CheckCircle className="w-5 h-5 text-[#dc5f18] flex-shrink-0 mt-1" />
+                            <CheckCircle className="w-5 h-5 text-[#c44d00] flex-shrink-0 mt-1" />
                             <span className="text-gray-700 font-medium">{item}</span>
                         </li>
                     ))}

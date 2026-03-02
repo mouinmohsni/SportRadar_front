@@ -77,7 +77,7 @@ const PrivacyPolicyPage: React.FC = () => (
                     </ul>
                     <p className="text-gray-700 mt-2">
                         Pour exercer ces droits, contactez-nous à&nbsp;
-                        <a href="#" className="text-[#dc5f18] hover:underline">
+                        <a href="#" className="text-[#c44d00] hover:underline">
                             contact@sportradar.com
                         </a>.
                     </p>
@@ -85,7 +85,7 @@ const PrivacyPolicyPage: React.FC = () => (
 
                 {/* Retour à l’accueil */}
                 <div className="text-center">
-                    <Link to="/" className="text-[#dc5f18] hover:underline font-semibold">
+                    <Link to="/" className="text-[#c44d00] hover:underline font-semibold">
                         ← Retour à l’accueil
                     </Link>
                 </div>

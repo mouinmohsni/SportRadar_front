@@ -98,7 +98,7 @@ const LoginPage: React.FC = () => {
             {/* Header */}
             <div className="px-6 py-8 bg-[#0a1128] text-center">
               <Link to="/" className="inline-flex items-center mb-4">
-                <Heart className="w-8 h-8 text-[#dc5f18]" />
+                <Heart className="w-8 h-8 text-[#c44d00]" />
                 <span className="text-xl font-bold ml-2 text-white">SportRadar</span>
               </Link>
               <h1 className="text-2xl font-bold text-white">
@@ -125,7 +125,7 @@ const LoginPage: React.FC = () => {
                             className={`flex-1 flex items-center justify-center space-x-1 py-2 px-1 rounded-md text-[11px] font-bold transition-all ${
                                 accountType === role.id
                                     ? 'bg-white text-[#0a1128] shadow-sm'
-                                    : 'text-gray-400 hover:text-white hover:bg-[#dc5f18]/20'
+                                    : 'text-gray-400 hover:text-white hover:bg-[#c44d00]/20'
                             }`}
                         >
                           <role.icon className="w-3.5 h-3.5" />
@@ -146,7 +146,7 @@ const LoginPage: React.FC = () => {
               {/* --- SECTION UTILISATEUR (Toujours visible pour l'inscription) --- */}
               {!isLogin && (
                   <div className="space-y-4">
-                    <p className="text-[10px] font-bold text-[#dc5f18] uppercase tracking-widest border-b border-gray-100 pb-1">
+                    <p className="text-[10px] font-bold text-[#c44d00] uppercase tracking-widest border-b border-gray-100 pb-1">
                       Informations de compte
                     </p>
                     <div>
@@ -159,7 +159,7 @@ const LoginPage: React.FC = () => {
                             value={formData.username}
                             onChange={handleInputChange}
                             required
-                            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#dc5f18] outline-none"
+                            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#c44d00] outline-none"
                             placeholder="Ex: sport_passion"
                         />
                       </div>
@@ -177,7 +177,7 @@ const LoginPage: React.FC = () => {
                       value={formData.email}
                       onChange={handleInputChange}
                       required
-                      className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#dc5f18] outline-none"
+                      className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#c44d00] outline-none"
                       placeholder="test@test.com"
                   />
                 </div>
@@ -186,7 +186,7 @@ const LoginPage: React.FC = () => {
               {/* --- SECTION ENTREPRISE (Uniquement si Business sélectionné) --- */}
               {!isLogin && accountType === 'business' && (
                   <div className="space-y-4 pt-2">
-                    <p className="text-[10px] font-bold text-[#dc5f18] uppercase tracking-widest border-b border-gray-100 pb-1">
+                    <p className="text-[10px] font-bold text-[#c44d00] uppercase tracking-widest border-b border-gray-100 pb-1">
                       Informations de l'entreprise
                     </p>
                     <div>
@@ -199,7 +199,7 @@ const LoginPage: React.FC = () => {
                             value={formData.company_name}
                             onChange={handleInputChange}
                             required
-                            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#dc5f18] outline-none"
+                            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#c44d00] outline-none"
                             placeholder="Mon Entreprise"
                         />
                       </div>
@@ -214,7 +214,7 @@ const LoginPage: React.FC = () => {
                             value={formData.company_address}
                             onChange={handleInputChange}
                             required
-                            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#dc5f18] outline-none"
+                            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#c44d00] outline-none"
                             placeholder="123 rue du Sport, Paris"
                         />
                       </div>
@@ -232,7 +232,7 @@ const LoginPage: React.FC = () => {
                       value={formData.password}
                       onChange={handleInputChange}
                       required
-                      className="w-full pl-10 pr-12 py-2 border rounded-lg focus:ring-2 focus:ring-[#dc5f18] outline-none"
+                      className="w-full pl-10 pr-12 py-2 border rounded-lg focus:ring-2 focus:ring-[#c44d00] outline-none"
                       placeholder="••••••••••••"
                   />
                   <button
@@ -256,7 +256,7 @@ const LoginPage: React.FC = () => {
                           value={formData.confirmPassword}
                           onChange={handleInputChange}
                           required
-                          className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#dc5f18] outline-none"
+                          className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#c44d00] outline-none"
                       />
                     </div>
                   </div>
@@ -277,7 +277,7 @@ const LoginPage: React.FC = () => {
                 <button
                     type="button"
                     onClick={() => { setIsLogin(!isLogin); setErrorMsg(null); }}
-                    className="ml-2 text-[#dc5f18] font-bold hover:underline"
+                    className="ml-2 text-[#c44d00] font-bold hover:underline"
                 >
                   {isLogin ? "S'inscrire" : "Se connecter"}
                 </button>

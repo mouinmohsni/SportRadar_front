@@ -118,8 +118,9 @@ const CoachDetailPage: React.FC = () => {
     return (
         <>
             <SEO
-                title={`${getCoachDisplayName()} - Coach Sportif`}
-                description={`Découvrez le profil de ${getCoachDisplayName()}, coach professionnel${coach.company ? ` chez ${coach.company.name}` : ''}. Consultez ses ${activities.length} activités sportives et réservez votre séance.`}
+                title={`Coach ${coach.first_name} ${coach.last_name} | Expert SportRadar`}
+                description={`Découvrez le profil de ${coach.first_name} ${coach.last_name}, coach expert sur SportRadar. Retrouvez ses activités, ses spécialités sportives et réservez votre prochaine séance !`}
+                keywords={`${coach.first_name} ${coach.last_name}, coach sportif, expert fitness, coaching personnalisé, réserver coach, sportradar`}
             />
 
             <div className="p-8 max-w-7xl mx-auto">

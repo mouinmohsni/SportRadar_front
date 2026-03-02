@@ -123,7 +123,7 @@ const CorporateOffersPage: React.FC = () => {
                         animate={{ opacity: 1, y: 0 }}
                         className="text-center bg-gradient-to-r from-[#0a1128] to-[#14213d] text-white rounded-2xl p-8"
                     >
-                        <Shield className="mx-auto w-16 h-16 text-[#dc5f18] mb-4" />
+                        <Shield className="mx-auto w-16 h-16 text-[#c44d00] mb-4" />
                         <h1 className="text-4xl lg:text-5xl font-extrabold mb-2">Offres entreprises</h1>
                         <p className="text-lg">
                             Solutions bien-être sur mesure pour les professionnels : boostez l’engagement et la cohésion de vos équipes.
@@ -138,7 +138,7 @@ const CorporateOffersPage: React.FC = () => {
                                 <ul className="space-y-3">
                                     {benefits.map((b, i) => (
                                         <li key={i} className="flex items-center space-x-3">
-                                            <CheckCircle className="w-6 h-6 text-[#dc5f18]" />
+                                            <CheckCircle className="w-6 h-6 text-[#c44d00]" />
                                             <span className="text-gray-600">{b}</span>
                                         </li>
                                     ))}
@@ -147,12 +147,12 @@ const CorporateOffersPage: React.FC = () => {
                             <div className="lg:w-1/2 grid grid-cols-2 gap-6 mt-8 lg:mt-0">
                                 <div className="p-4 bg-gray-50 rounded-lg text-center">
                                     <CalendarIcon className="w-10 h-10 text-[#0a1128] mx-auto mb-2" />
-                                    <div className="font-bold text-[#dc5f18] text-2xl">+23%</div>
+                                    <div className="font-bold text-[#c44d00] text-2xl">+23%</div>
                                     <div className="text-gray-600 text-sm">Productivité</div>
                                 </div>
                                 <div className="p-4 bg-gray-50 rounded-lg text-center">
                                     <UsersIcon className="w-10 h-10 text-[#0a1128] mx-auto mb-2" />
-                                    <div className="font-bold text-[#dc5f18] text-2xl">92%</div>
+                                    <div className="font-bold text-[#c44d00] text-2xl">92%</div>
                                     <div className="text-gray-600 text-sm">Engagement</div>
                                 </div>
                             </div>
@@ -168,22 +168,22 @@ const CorporateOffersPage: React.FC = () => {
                             {plans.map(pl => (
                                 <div
                                     key={pl.key}
-                                    className={`p-6 rounded-lg border ${pl.popular ? 'border-[#dc5f18]' : 'border-gray-200'} transition`}
+                                    className={`p-6 rounded-lg border ${pl.popular ? 'border-[#c44d00]' : 'border-gray-200'} transition`}
                                 >
                                     {pl.popular && (
-                                        <span className="inline-block mb-4 bg-[#dc5f18] text-white px-3 py-1 rounded-full text-sm">
+                                        <span className="inline-block mb-4 bg-[#c44d00] text-white px-3 py-1 rounded-full text-sm">
                                             Populaire
                                         </span>
                                     )}
                                     <h3 className="text-xl font-semibold text-[#0a1128] mb-2">{pl.name}</h3>
-                                    <div className="text-3xl font-bold text-[#dc5f18] mb-4">
+                                    <div className="text-3xl font-bold text-[#c44d00] mb-4">
                                         {pl.price}
                                         {pl.period && <span className="text-gray-600 text-lg">/{pl.period}</span>}
                                     </div>
                                     <ul className="space-y-2 mb-6 text-gray-600 text-sm">
                                         {pl.features.map((f, idx) => (
                                             <li key={idx} className="flex items-center space-x-2">
-                                                <CheckCircle className="w-4 h-4 text-[#dc5f18]" />
+                                                <CheckCircle className="w-4 h-4 text-[#c44d00]" />
                                                 <span>{f}</span>
                                             </li>
                                         ))}
@@ -191,7 +191,7 @@ const CorporateOffersPage: React.FC = () => {
                                     <button
                                         onClick={() => setSelectedPlan(pl.key)}
                                         className={`w-full py-2 rounded-lg font-semibold transition ${selectedPlan === pl.key
-                                            ? 'bg-[#dc5f18] text-white'
+                                            ? 'bg-[#c44d00] text-white'
                                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                             }`}
                                     >
@@ -277,7 +277,7 @@ const CorporateOffersPage: React.FC = () => {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full bg-[#dc5f18] text-white py-3 rounded-lg font-semibold hover:brightness-110 disabled:opacity-50"
+                                className="w-full bg-[#c44d00] text-white py-3 rounded-lg font-semibold hover:brightness-110 disabled:opacity-50"
                             >
                                 {loading ? 'Envoi…' : 'Nous contacter'}
                             </button>

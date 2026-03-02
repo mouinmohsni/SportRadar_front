@@ -135,7 +135,7 @@ const BusinessPage: React.FC = () => {
                 transition={{ duration: 0.6 }}
                 className="text-4xl lg:text-6xl font-extrabold leading-tight"
               >
-                Le bien-être <span className="text-[#dc5f18]">entreprise</span><br />nouvelle génération
+                Le bien-être <span className="text-[#c44d00]">entreprise</span><br />nouvelle génération
               </motion.h1>
               <motion.p
                 initial={{ opacity: 0 }}
@@ -151,7 +151,7 @@ const BusinessPage: React.FC = () => {
               <div className="grid grid-cols-3 gap-4 pt-6">
                 {benefits.slice(0, 3).map((b, i) => (
                   <div key={i} className="flex items-center space-x-2">
-                    <CheckCircle className="w-6 h-6 text-[#dc5f18]" />
+                    <CheckCircle className="w-6 h-6 text-[#c44d00]" />
                     <span className="text-sm text-gray-200">{b}</span>
                   </div>
                 ))}
@@ -176,7 +176,7 @@ const BusinessPage: React.FC = () => {
         <section className="bg-white shadow-lg rounded-2xl p-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-3xl font-bold text-[#dc5f18]">500+</div>
+              <div className="text-3xl font-bold text-[#c44d00]">500+</div>
               <div className="text-gray-600">Entreprises clientes</div>
             </div>
             <div>
@@ -184,7 +184,7 @@ const BusinessPage: React.FC = () => {
               <div className="text-gray-600">Taux de participation</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-[#dc5f18]">32%</div>
+              <div className="text-3xl font-bold text-[#c44d00]">32%</div>
               <div className="text-gray-600">Réduction absentéisme</div>
             </div>
             <div>
@@ -215,7 +215,7 @@ const BusinessPage: React.FC = () => {
                     whileHover={{ scale: 1.02 }}
                     className="text-center"
                   >
-                    <div className="w-12 h-12 mx-auto flex items-center justify-center bg-[#dc5f18] rounded-md mb-4">
+                    <div className="w-12 h-12 mx-auto flex items-center justify-center bg-[#c44d00] rounded-md mb-4">
                       <Icon className="w-6 h-6 text-white" />
                     </div>
                     <h3 className="font-semibold text-[#0a1128] mb-2 text-lg">{f.title}</h3>
@@ -237,7 +237,7 @@ const BusinessPage: React.FC = () => {
               <ul className="space-y-3">
                 {benefits.map((b, i) => (
                   <li key={i} className="flex items-center space-x-3">
-                    <CheckCircle className="w-6 h-6 text-[#dc5f18]" />
+                    <CheckCircle className="w-6 h-6 text-[#c44d00]" />
                     <span className="text-gray-600">{b}</span>
                   </li>
                 ))}
@@ -246,12 +246,12 @@ const BusinessPage: React.FC = () => {
             <div className="lg:w-1/2 grid grid-cols-2 gap-6">
               <div className="p-4 bg-gray-50 rounded-lg text-center">
                 <CalendarIcon className="w-10 h-10 text-[#0a1128] mx-auto mb-2" />
-                <div className="font-bold text-[#dc5f18] text-2xl">+23%</div>
+                <div className="font-bold text-[#c44d00] text-2xl">+23%</div>
                 <div className="text-gray-600 text-sm">Productivité</div>
               </div>
               <div className="p-4 bg-gray-50 rounded-lg text-center">
                 <Users className="w-10 h-10 text-[#0a1128] mx-auto mb-2" />
-                <div className="font-bold text-[#dc5f18] text-2xl">92%</div>
+                <div className="font-bold text-[#c44d00] text-2xl">92%</div>
                 <div className="text-gray-600 text-sm">Engagement</div>
               </div>
             </div>
@@ -266,30 +266,30 @@ const BusinessPage: React.FC = () => {
             {plans.map((plan, i) => (
               <div
                 key={i}
-                className={`p-6 rounded-lg border transition ${plan.popular ? 'border-[#dc5f18]' : 'border-gray-200'
+                className={`p-6 rounded-lg border transition ${plan.popular ? 'border-[#c44d00]' : 'border-gray-200'
                   }`}
               >
                 {plan.popular && (
-                  <span className="inline-block mb-4 bg-[#dc5f18] text-white px-3 py-1 rounded-full text-sm">
+                  <span className="inline-block mb-4 bg-[#c44d00] text-white px-3 py-1 rounded-full text-sm">
                     Populaire
                   </span>
                 )}
                 <h3 className="text-xl font-semibold text-[#0a1128] mb-2">{plan.name}</h3>
-                <div className="text-3xl font-bold text-[#dc5f18] mb-4">
+                <div className="text-3xl font-bold text-[#c44d00] mb-4">
                   {plan.price}
                   {plan.period && <span className="text-gray-600 text-lg">/{plan.period}</span>}
                 </div>
                 <ul className="space-y-2 mb-6 text-gray-600 text-sm">
                   {plan.features.map((f, idx) => (
                     <li key={idx} className="flex items-center space-x-2">
-                      <CheckCircle className="w-4 h-4 text-[#dc5f18]" />
+                      <CheckCircle className="w-4 h-4 text-[#c44d00]" />
                       <span>{f}</span>
                     </li>
                   ))}
                 </ul>
                 <Link
                   to={`/subscribe/${planKeyFromName(plan.name)}`}
-                  className="block text-center bg-[#dc5f18] text-white px-4 py-2 rounded-lg font-semibold hover:brightness-110 transition"
+                  className="block text-center bg-[#c44d00] text-white px-4 py-2 rounded-lg font-semibold hover:brightness-110 transition"
                 >
                   {plan.name === 'Abonnement sur mesure' ? 'Nous contacter' : 'Commencer'}
                 </Link>
@@ -318,13 +318,13 @@ const BusinessPage: React.FC = () => {
 
         {/* Call to Action */}
         <section className="bg-white shadow-lg rounded-2xl p-8 text-center">
-          <Award className="w-12 h-12 text-[#dc5f18] mx-auto mb-4" />
+          <Award className="w-12 h-12 text-[#c44d00] mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-[#0a1128] mb-4">
             Prêt·e à booster le bien-être de vos équipes ?
           </h2>
           <Link
             to="/corporate-offers"
-            className="inline-block bg-[#dc5f18] text-white px-6 py-3 rounded-lg font-semibold hover:brightness-110 transition"
+            className="inline-block bg-[#c44d00] text-white px-6 py-3 rounded-lg font-semibold hover:brightness-110 transition"
           >
             Abonnez vos équipes !
           </Link>

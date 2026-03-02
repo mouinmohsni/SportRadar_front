@@ -185,8 +185,9 @@ const ActivityDetailPage: React.FC = () => {
     return (
         <>
             <SEO
-                title={`${activity.name} | SportRadar - ${activity.category}`}
-                description={`${activity.description}`}
+                title={`${activity.name} | Réservez sur SportRadar`}
+                description={`Réservez votre séance de ${activity.category} à ${activity.location_address} avec ${activity.instructor?.first_name}. Rejoignez ${activity.max_participants} participants pour une expérience unique !`}
+                keywords={`${activity.category}, réservation ${activity.category}, sport ${activity.location_address}, ${activity.instructor?.first_name}, coaching sport, sportradar`}
             />
 
             <div className="min-h-screen bg-gray-100 py-12 px-4">

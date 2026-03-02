@@ -65,8 +65,9 @@ const HomePage: React.FC = () => {
            - La description est engageante, contient des mots-clés et respecte la longueur idéale (environ 155 caractères).
       */}
         <SEO
-            title="Accueil - Trouvez et Réservez votre Activité Sportive"
-            description="SportRadar est la plateforme leader pour découvrir, comparer et réserver des milliers d'activités sportives près de chez vous. Yoga, boxe, escalade... Commencez aujourd'hui !"
+            title="Toutes nos Activités Sportives | SportRadar"
+            description="Découvrez et réservez des centaines d'activités sportives près de chez vous : Yoga, Fitness, Boxe, Natation et bien plus. Trouvez la séance idéale avec SportRadar !"
+            keywords="sport, fitness, yoga, boxe, natation, réservation sport, activités locales, bien-être"
         />
 
         <div className="min-h-screen font-sans text-gray-800">
@@ -95,7 +96,7 @@ const HomePage: React.FC = () => {
                      Elle est unique et bien visible.
                 */}
                   <h1 className="text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-400 mb-6">
-                    Ici, maintenant, <span className="text-[#dc5f18]">à ton rythme !</span>
+                    Ici, maintenant, <span className="text-[#c44d00]">à ton rythme !</span>
                   </h1>
                   <p className="text-xl text-gray-400 mb-10 leading-relaxed">
                     SportRadar vous accompagne dans votre reprise d'activité sportive avec des recommandations personnalisées,
@@ -104,14 +105,14 @@ const HomePage: React.FC = () => {
                   <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                     <Link
                         to="/activities"
-                        className="bg-[#dc5f18] text-white px-8 py-4 rounded-xl text-lg font-semibold hover:brightness-110 transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl flex items-center justify-center"
+                        className="bg-[#c44d00] text-white px-8 py-4 rounded-xl text-lg font-semibold hover:brightness-110 transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl flex items-center justify-center"
                     >
                       <span>Découvrir les activités</span>
                       <ArrowRight className="w-5 h-5 ml-2" />
                     </Link>
                     <Link
                         to="/login"
-                        className="border-2 border-[#dc5f18] text-[#dc5f18] px-8 py-4 rounded-xl text-lg font-semibold hover:bg-[#dc5f18] hover:text-white transition-all duration-300 transform hover:scale-105"
+                        className="border-2 border-[#c44d00] text-[#c44d00] px-8 py-4 rounded-xl text-lg font-semibold hover:bg-[#c44d00] hover:text-white transition-all duration-300 transform hover:scale-105"
                     >
                       Créer mon compte
                     </Link>
@@ -155,11 +156,11 @@ const HomePage: React.FC = () => {
                         onClick={() => navigate(link)}
                         className="cursor-pointer flex flex-col items-center text-center space-y-4 p-6 bg-[#ABC2D7] backdrop-blur-md rounded-2xl shadow-md hover:shadow-xl transition-shadow"
                     >
-                      <Icon className="w-10 h-10 text-[#dc5f18]" />
+                      <Icon className="w-10 h-10 text-[#c44d00]" />
                       {/*
                     5. La balise <h3> est maintenant correcte, car elle est sous un <h2>.
                   */}
-                      <h3 className="text-xl font-semibold text-[#0a1128]">{title}</h3>
+                      <h3 className="text-xl font-semibold text-[#0a1128]">{title} </h3>
                       <p className="text-sm text-[#0a1128]">{description}</p>
                     </div>
                 ))}
@@ -181,7 +182,7 @@ const HomePage: React.FC = () => {
                     <div key={index} className="bg-[#ABC2D7] p-8 rounded-2xl shadow-sm">
                       <div className="flex items-center mb-4">
                         {[...Array(testimonial.rating)].map((_, i) => (
-                            <Star key={i} className="w-5 h-5 text-[#dc5f18] fill-current" />
+                            <Star key={i} className="w-5 h-5 text-[#c44d00] fill-current" />
                         ))}
                       </div>
                       <p className="text-[#0a1128] mb-4 italic">"{testimonial.content}"</p>

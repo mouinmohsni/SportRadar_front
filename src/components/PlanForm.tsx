@@ -107,7 +107,7 @@ const PlanForm: React.FC<PlanFormProps> = ({ planKey }) => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-[#dc5f18] text-white py-3 rounded-lg font-semibold hover:brightness-110 disabled:opacity-50"
+                        className="w-full bg-[#c44d00] text-white py-3 rounded-lg font-semibold hover:brightness-110 disabled:opacity-50"
                     >
                         {loading ? 'Envoi…' : 'Soumettre'}
                     </button>

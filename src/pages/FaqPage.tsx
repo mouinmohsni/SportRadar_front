@@ -46,7 +46,7 @@ const FaqPage: React.FC = () => {
                 {/* Bouton retour */}
                 <Link
                     to="/"
-                    className="flex items-center text-[#0a1128] hover:text-[#dc5f18] mb-8"
+                    className="flex items-center text-[#0a1128] hover:text-[#c44d00] mb-8"
                 >
                     <Home className="w-5 h-5 mr-2" />
                     Retour à l’accueil
@@ -109,7 +109,7 @@ const FaqPage: React.FC = () => {
                             Mettre à jour votre profil
                         </h2>
                         <p className="text-gray-700 leading-relaxed">
-                            Dans <Link to="/profile" className="text-[#dc5f18] hover:underline">votre profil</Link>, définissez vos objectifs (remise en forme, endurance, bien-être, etc.).
+                            Dans <Link to="/profile" className="text-[#c44d00] hover:underline">votre profil</Link>, définissez vos objectifs (remise en forme, endurance, bien-être, etc.).
                             Nos recommandations s’adaptent ensuite automatiquement à vos préférences et votre niveau.
                         </p>
                     </section>

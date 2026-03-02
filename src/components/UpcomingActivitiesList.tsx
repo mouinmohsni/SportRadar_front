@@ -52,7 +52,7 @@ const UpcomingActivitiesList: React.FC<Props> = ({ activities }) => {
 
                     <div className="flex-grow">
                       {/* Nom de l'activité */}
-                      <Link to={`/activities/${act.id}`} className="hover:text-[#dc5f18] transition-colors">
+                      <Link to={`/activities/${act.id}`} className="hover:text-[#c44d00] transition-colors">
                         <p className="font-bold text-lg text-[#0a1128]">{act.name}</p>
                       </Link>
 
@@ -66,17 +66,17 @@ const UpcomingActivitiesList: React.FC<Props> = ({ activities }) => {
                       <div className="mt-3 space-y-1 text-sm text-gray-700">
                         {/* 3. Date et Heure */}
                         <div className="flex items-center">
-                          <Calendar className="w-4 h-4 mr-2 text-[#dc5f18]" />
+                          <Calendar className="w-4 h-4 mr-2 text-[#c44d00]" />
                           <span>{date}</span>
                         </div>
                         <div className="flex items-center">
-                          <Clock className="w-4 h-4 mr-2 text-[#dc5f18]" />
+                          <Clock className="w-4 h-4 mr-2 text-[#c44d00]" />
                           <span>{time}</span>
                         </div>
 
                         {/* 4. Lieu */}
                         <div className="flex items-center">
-                          <MapPin className="w-4 h-4 mr-2 text-[#dc5f18]" />
+                          <MapPin className="w-4 h-4 mr-2 text-[#c44d00]" />
                           <span>{act.effective_location || 'Lieu non spécifié'}</span>
                         </div>
                       </div>

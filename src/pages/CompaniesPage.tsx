@@ -74,8 +74,9 @@ const CompaniesPage: React.FC = () => {
     return (
         <>
             <SEO
-                title="Toutes les Salles de Sport"
-                description={`Découvrez ${companies.length} salles de sport partenaires. Trouvez la salle de sport idéale près de chez vous et explorez leurs activités et coachs professionnels.`}
+                title="Nos Salles de Sport et Clubs de Fitness | SportRadar"
+                description="Découvrez les meilleures salles de sport, studios de yoga et clubs de fitness partenaires de SportRadar. Comparez les équipements et trouvez le lieu idéal pour vos entraînements !"
+                keywords="salle de sport, club fitness, studio yoga, centre sportif, salle de musculation, réserver salle de sport, club de boxe, sportradar"
             />
 
             <div className="min-h-screen bg-[#C7C5C5] py-10 px-4">
@@ -115,9 +116,9 @@ const CompaniesPage: React.FC = () => {
                     </div>
 
                     {/* Compteur de résultats */}
-                    <p className="text-gray-600 mb-4">
+                    <h2 className="text-gray-600 mb-4">
                         {filtered.length} salle{filtered.length > 1 ? 's' : ''} trouvée{filtered.length > 1 ? 's' : ''}
-                    </p>
+                    </h2>
 
                     {/* Grille des salles de sport */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6">

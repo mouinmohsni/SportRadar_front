@@ -40,7 +40,7 @@ const StarterForm: React.FC = () => {
             <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-lg p-8">
                 <button
                     onClick={() => navigate(-1)}
-                    className="flex items-center text-[#0a1128] hover:text-[#dc5f18] mb-4"
+                    className="flex items-center text-[#0a1128] hover:text-[#c44d00] mb-4"
                 >
                     <ArrowLeft className="w-5 h-5 mr-2" /> Retour
                 </button>
@@ -107,7 +107,7 @@ const StarterForm: React.FC = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-[#dc5f18] text-white py-3 rounded-lg font-semibold hover:brightness-110 disabled:opacity-50"
+                        className="w-full bg-[#c44d00] text-white py-3 rounded-lg font-semibold hover:brightness-110 disabled:opacity-50"
                     >
                         {loading ? 'Envoi…' : 'Commencer'}
                     </button>

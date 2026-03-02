@@ -21,7 +21,7 @@ const analyticsDetails = [
     'Export au format CSV ou PDF'
 ];
 
-const COLORS = ['#0a1128', '#dc5f18', '#ABC2D7', '#82ca9d', '#ffc658'];
+const COLORS = ['#0a1128', '#c44d00', '#ABC2D7', '#82ca9d', '#ffc658'];
 
 const AnalyticsAvancesPage: React.FC = () => {
     const navigate = useNavigate();
@@ -75,13 +75,13 @@ const AnalyticsAvancesPage: React.FC = () => {
             <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-2xl p-8 space-y-8">
                 <button
                     onClick={() => navigate(-1)}
-                    className="flex items-center text-[#0a1128] hover:text-[#dc5f18] transition"
+                    className="flex items-center text-[#0a1128] hover:text-[#c44d00] transition"
                 >
                     <ArrowLeft className="w-5 h-5 mr-2" />Retour
                 </button>
 
                 <div className="flex items-center space-x-4">
-                    <div className="p-3 bg-[#dc5f18] rounded-md">
+                    <div className="p-3 bg-[#c44d00] rounded-md">
                         <BarChart3 className="w-6 h-6 text-white" />
                     </div>
                     <h1 className="text-3xl font-bold text-[#0a1128]">Analytics avancés</h1>
@@ -95,7 +95,7 @@ const AnalyticsAvancesPage: React.FC = () => {
                 <ul className="list-disc list-inside space-y-2">
                     {analyticsDetails.map((item, i) => (
                         <li key={i} className="flex items-start space-x-2">
-                            <CheckCircle className="w-5 h-5 text-[#dc5f18] mt-1" />
+                            <CheckCircle className="w-5 h-5 text-[#c44d00] mt-1" />
                             <span className="text-gray-700 font-medium">{item}</span>
                         </li>
                     ))}
@@ -123,7 +123,7 @@ const AnalyticsAvancesPage: React.FC = () => {
                             <XAxis dataKey="city" />
                             <YAxis />
                             <RechartsTooltip />
-                            <Bar dataKey="count" fill="#dc5f18" />
+                            <Bar dataKey="count" fill="#c44d00" />
                         </BarChart>
                     </ResponsiveContainer>
                 </div>

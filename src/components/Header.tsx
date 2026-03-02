@@ -32,7 +32,7 @@ const Header: React.FC = () => {
             <Link
                 to="/"
                 onClick={() => window.scrollTo(0, 0)}
-                className="hover:text-[#dc5f18] transition-colors"
+                className="hover:text-[#c44d00] transition-colors"
             >
               Accueil
             </Link>
@@ -40,30 +40,38 @@ const Header: React.FC = () => {
             {/* ===== UTILISATEUR NON CONNECTÉ ===== */}
             {!isAuthenticated && (
                 <>
+
                   <Link
                       to="/activities"
                       onClick={() => window.scrollTo(0, 0)}
-                      className="hover:text-[#dc5f18] transition-colors"
+                      className="hover:text-[#c44d00] transition-colors"
                   >
                     Activités
                   </Link>
                   <Link
                       to="/coaches"
                       onClick={() => window.scrollTo(0, 0)}
-                      className="hover:text-[#dc5f18] transition-colors"
+                      className="hover:text-[#c44d00] transition-colors"
                   >
                     Coaches
                   </Link>
                   <Link
                       to="/companies"
                       onClick={() => window.scrollTo(0, 0)}
-                      className="hover:text-[#dc5f18] transition-colors"
+                      className="hover:text-[#c44d00] transition-colors"
                   >
                     Salles de Sport
                   </Link>
                   <Link
+                      to="/services"
+                      onClick={() => window.scrollTo(0, 0)}
+                      className="hover:text-[#c44d00] transition-colors"
+                  >
+                    Nos Services
+                  </Link>
+                  <Link
                       to="/login"
-                      className="bg-[#dc5f18] px-4 py-2 rounded hover:bg-[#b84f14] transition-colors"
+                      className="bg-[#c44d00] px-4 py-2 rounded hover:bg-[#b84f14] transition-colors"
                       onClick={() => window.scrollTo(0, 0)}
                   >
                     Connexion
@@ -77,42 +85,42 @@ const Header: React.FC = () => {
                   <Link
                       to="/activities"
                       onClick={() => window.scrollTo(0, 0)}
-                      className="hover:text-[#dc5f18] transition-colors"
+                      className="hover:text-[#c44d00] transition-colors"
                   >
                     Activités
                   </Link>
                   <Link
                       to="/coaches"
                       onClick={() => window.scrollTo(0, 0)}
-                      className="hover:text-[#dc5f18] transition-colors"
+                      className="hover:text-[#c44d00] transition-colors"
                   >
                     Coaches
                   </Link>
                   <Link
                       to="/companies"
                       onClick={() => window.scrollTo(0, 0)}
-                      className="hover:text-[#dc5f18] transition-colors"
+                      className="hover:text-[#c44d00] transition-colors"
                   >
                     Salles de Sport
                   </Link>
                   <Link
                       to="/dashboard"
                       onClick={() => window.scrollTo(0, 0)}
-                      className="hover:text-[#dc5f18] transition-colors"
+                      className="hover:text-[#c44d00] transition-colors"
                   >
                     Dashboard
                   </Link>
                   <Link
                       to="/admin"
                       onClick={() => window.scrollTo(0, 0)}
-                      className="hover:text-[#dc5f18] transition-colors"
+                      className="hover:text-[#c44d00] transition-colors"
                   >
                     Admin
                   </Link>
                   {/*<NotificationCenter />*/}
                   <button
                       onClick={handleLogout}
-                      className="bg-[#dc5f18] px-4 py-2 rounded hover:bg-[#b84f14] transition-colors"
+                      className="bg-[#c44d00] px-4 py-2 rounded hover:bg-[#b84f14] transition-colors"
                   >
                     Déconnexion
                   </button>
@@ -125,14 +133,14 @@ const Header: React.FC = () => {
                   <Link
                       to="/dashboard"
                       onClick={() => window.scrollTo(0, 0)}
-                      className="hover:text-[#dc5f18] transition-colors"
+                      className="hover:text-[#c44d00] transition-colors"
                   >
                     Dashboard
                   </Link>
                   <Link
                       to="/business"
                       onClick={() => window.scrollTo(0, 0)}
-                      className="hover:text-[#dc5f18] transition-colors"
+                      className="hover:text-[#c44d00] transition-colors"
                   >
                     Espace Entreprise
                   </Link>
