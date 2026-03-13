@@ -20,7 +20,7 @@ const CoachDetailPage: React.FC = () => {
     useEffect(() => {
         // ✅ Faire 2 appels API en parallèle
         Promise.all([
-            axiosInstance.get<User>(`/api/users/${id}/`),
+            axiosInstance.get<User>(`/api/coaches/${id}/`),
             axiosInstance.get<Activity[]>(`/api/activities/`)
         ])
             .then(([coachResponse, activitiesResponse]) => {
