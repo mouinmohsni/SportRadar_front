@@ -22,6 +22,8 @@ const ActivityDetailPage: React.FC = () => {
     const [activity, setActivity] = useState<Activity | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [nb_persone, setNb_persone]=useState(1);
+
 
     const navigate = useNavigate();
     const { isAuthenticated,user } = useAuth();
@@ -53,6 +55,7 @@ const ActivityDetailPage: React.FC = () => {
                 const isUserRegistered = bookingsRes.data.some(booking => booking.activity.id === Number(id));
                 setIsRegistered(isUserRegistered);
 
+
             } catch (err) {
                 console.error("Erreur lors du chargement des données de la page", err);
                 setError("L'activité n'a pas pu être chargée ou n'existe pas.");
@@ -72,6 +75,8 @@ const ActivityDetailPage: React.FC = () => {
     if (error || !activity) {
         return <div className="min-h-screen flex justify-center items-center text-red-500">{error || "Activité non trouvée."}</div>;
     }
+
+
 
 
     // ... (les fonctions handleReviewSubmit et handleRegisterClick ne changent pas)
@@ -142,7 +147,7 @@ const ActivityDetailPage: React.FC = () => {
                     setActivity(prev => prev ? { ...prev, participants_count: prev.participants_count - 1 } : null);
                 }
             } else {
-                await axiosInstance.post('/api/bookings/', { activity: activity.id });
+                await axiosInstance.post('/api/bookings/', { activity: activity.id ,number_of_places: nb_persone });
                 setIsRegistered(true);
                 setActivity(prev => prev ? { ...prev, participants_count: prev.participants_count + 1 } : null);
             }
@@ -264,29 +269,76 @@ const ActivityDetailPage: React.FC = () => {
                                     // Cas 1 : L'utilisateur est un client ('personal')
                                     if (user?.type === 'personal') {
                                         return (
-                                            <button
-                                                onClick={handleRegisterClick}
-                                                disabled={isSubmitting || (isFull && !isRegistered)}
-                                                className={`font-bold py-3 px-6 rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed
+                                            <div className="mt-8 pt-6 border-t border-gray-100">
+                                                <div className="flex flex-col items-center sm:flex-row items-end justify-end gap-4">
+                                                    {/* Bloc Input */}
+                                                    <div className="w-full sm:w-48">
+                                                        <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                                                            Nombre de participants
+                                                        </label>
+                                                        <div className="relative">
+                                                            <input
+                                                                name="nb_persone"
+                                                                type="number"
+                                                                value={nb_persone}
+                                                                disabled={!activity}
+                                                                min="1"
+                                                                max={activity ? activity.max_participants - activity.participants_count : 1}
+                                                                onChange={e => {
+                                                                    if (!activity) return;
+                                                                    const max = activity.max_participants || 0;
+                                                                    const current = activity.participants_count || 0;
+                                                                    const placesRestantes = max - current;
+                                                                    const val = parseInt(e.target.value, 10);
+
+                                                                    if (isNaN(val) || val < 1) {
+                                                                        setNb_persone(1);
+                                                                    } else if (val > placesRestantes) {
+                                                                        setNb_persone(placesRestantes > 0 ? placesRestantes : 1);
+                                                                    } else {
+                                                                        setNb_persone(val);
+                                                                    }
+                                                                }}
+                                                                required
+                                                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#c44d00] focus:border-transparent outline-none transition-all text-lg font-medium"
+                                                            />
+                                                        </div>
+                                                        <p className="text-xs font-medium text-gray-500 mt-1.5 ml-1">
+                                                            {activity ? `${activity.max_participants - activity.participants_count} places libres` : 'Chargement...'}
+                                                        </p>
+                                                    </div>
+
+                                                    {/* Bouton d'action */}
+                                                    <button
+                                                        onClick={handleRegisterClick}
+                                                        disabled={isSubmitting || (isFull && !isRegistered)}
+                                                        className={`h-[52px] px-8 rounded-xl font-bold text-white shadow-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[200px]
                         ${isRegistered
-                                                    ? 'bg-gray-500 text-white hover:bg-gray-600'
-                                                    : isFull
-                                                        ? 'bg-red-300 text-red-800'
-                                                        : 'bg-[#dc5f18] text-white hover:brightness-110'
-                                                }
+                                                            ? 'bg-gray-600 hover:bg-gray-700 shadow-gray-200'
+                                                            : isFull
+                                                                ? 'bg-red-400 cursor-not-allowed'
+                                                                : 'bg-[#c44d00] hover:bg-[#a34000] shadow-orange-200'
+                                                        }
                     `}
-                                            >
-                                                {isSubmitting
-                                                    ? 'Chargement...'
-                                                    : isRegistered
-                                                        ? 'Se désinscrire'
-                                                        : isFull
-                                                            ? 'Complet'
-                                                            : `S'inscrire ( ${activity.price} € )`
-                                                }
-                                            </button>
+                                                    >
+                                                        {isSubmitting ? (
+                                                            <span className="flex items-center">
+                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            Patientez...
+                        </span>
+                                                        ) : isRegistered ? (
+                                                            'Se désinscrire'
+                                                        ) : isFull ? (
+                                                            'Complet'
+                                                        ) : (
+                                                            `Réserver (${+activity.price * nb_persone} €)`
+                                                        )}
+                                                    </button>
+                                                </div>
+                                            </div>
                                         );
                                     }
+
 
                                     // Cas 2 : L'utilisateur est un propriétaire d'entreprise ('business') ET
                                     // l'activité appartient à son entreprise.

@@ -1,5 +1,7 @@
 import React, {useState, useEffect, useMemo} from 'react';
-import {Link, useNavigate} from 'react-router-dom';
+// import {Link, useNavigate} from 'react-router-
+import {Link} from 'react-router-dom';
+
 import axiosInstance from '../api/axiosInstance';
 import {useAuth} from '../contexts/AuthContext';
 import CountUp from 'react-countup';
@@ -27,7 +29,7 @@ import type {Activity, Booking} from '../types';
 const ITEMS_PER_PAGE = 9;
 
 const ActivitiesPage: React.FC = () => {
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const {isAuthenticated,user} = useAuth();
     const [activities, setActivities] = useState<Activity[]>([]);
     const [registrations, setRegistrations] = useState<Map<number, number>>(new Map());
@@ -136,45 +138,45 @@ const ActivitiesPage: React.FC = () => {
 
     const totalActivities = activities.length;
 
-    const handleRegisterClick = async (act: Activity) => {
-        if (!isAuthenticated) {
-            navigate('/login', {state: {from: '/activities'}});
-            return;
-        }
-        try {
-            const isRegistered = registrations.has(act.id);
-            if (isRegistered) {
-                const bookingId = registrations.get(act.id);
-                await axiosInstance.delete(`/api/bookings/${bookingId}/`);
-                setRegistrations(prev => {
-                    const newMap = new Map(prev);
-                    newMap.delete(act.id);
-                    return newMap;
-                });
-                setActivities(prev => prev.map(a => a.id === act.id ? {
-                    ...a,
-                    participants_count: a.participants_count - 1
-                } : a));
-            } else {
-                const response = await axiosInstance.post<Booking>('/api/bookings/', {
-                    activity: act.id
-                });
-                const newBooking = response.data;
-                setRegistrations(prev => {
-                    const newMap = new Map(prev);
-                    newMap.set(act.id, newBooking.id);
-                    return newMap;
-                });
-                setActivities(prev => prev.map(a => a.id === act.id ? {
-                    ...a,
-                    participants_count: a.participants_count + 1
-                } : a));
-            }
-        } catch (error) {
-            console.error("Erreur lors de la mise à jour de l'inscription:", error);
-            alert('Erreur lors de la mise à jour de votre inscription.');
-        }
-    };
+    // const handleRegisterClick = async (act: Activity) => {
+    //     if (!isAuthenticated) {
+    //         navigate('/login', {state: {from: '/activities'}});
+    //         return;
+    //     }
+    //     try {
+    //         const isRegistered = registrations.has(act.id);
+    //         if (isRegistered) {
+    //             const bookingId = registrations.get(act.id);
+    //             await axiosInstance.delete(`/api/bookings/${bookingId}/`);
+    //             setRegistrations(prev => {
+    //                 const newMap = new Map(prev);
+    //                 newMap.delete(act.id);
+    //                 return newMap;
+    //             });
+    //             setActivities(prev => prev.map(a => a.id === act.id ? {
+    //                 ...a,
+    //                 participants_count: a.participants_count - 1
+    //             } : a));
+    //         } else {
+    //             const response = await axiosInstance.post<Booking>('/api/bookings/', {
+    //                 activity: act.id
+    //             });
+    //             const newBooking = response.data;
+    //             setRegistrations(prev => {
+    //                 const newMap = new Map(prev);
+    //                 newMap.set(act.id, newBooking.id);
+    //                 return newMap;
+    //             });
+    //             setActivities(prev => prev.map(a => a.id === act.id ? {
+    //                 ...a,
+    //                 participants_count: a.participants_count + 1
+    //             } : a));
+    //         }
+    //     } catch (error) {
+    //         console.error("Erreur lors de la mise à jour de l'inscription:", error);
+    //         alert('Erreur lors de la mise à jour de votre inscription.');
+    //     }
+    // };
 
     // ✅ Helper pour afficher le nom du coach
     const getCoachDisplayName = (instructor: Activity['instructor']): string => {
@@ -344,8 +346,7 @@ const ActivitiesPage: React.FC = () => {
                                         {user?.type === 'personal' ? (
                                             // CAS 1 : L'utilisateur est un client ("personal")
                                             <button
-                                                onClick={() => handleRegisterClick(act)}
-                                                disabled={isFull && !isReg}
+                                                onClick={() => window.location.href = `/activities/${act.id}`}                                                disabled={isFull && !isReg}
                                                 className={`w-full py-2 rounded-lg font-semibold transition-colors ${
                                                     isReg
                                                         ? 'bg-[#ABC2D7] text-[#0a1128] hover:bg-[#9ab0c5]'
