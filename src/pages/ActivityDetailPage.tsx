@@ -23,6 +23,8 @@ const ActivityDetailPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [nb_persone, setNb_persone]=useState(1);
+    const [user_nb_persone, setUser_nb_persone] = useState(0);
+
 
 
     const navigate = useNavigate();
@@ -54,6 +56,18 @@ const ActivityDetailPage: React.FC = () => {
                 setActivity(activityRes.data);
                 const isUserRegistered = bookingsRes.data.some(booking => booking.activity.id === Number(id));
                 setIsRegistered(isUserRegistered);
+                console.log("isUserRegistered=======",isUserRegistered)
+                const This_book =bookingsRes.data.filter(book=>book.activity.id==Number(id));
+                console.log("this book ", This_book[0]?.nb_persone) // ici ca va donner la reservation de cette acivier avec ce user
+                if (This_book[0]?.nb_persone > 1){
+                    setNb_persone(This_book[0].nb_persone)
+                }else{
+                    setNb_persone(1)
+                }
+
+
+
+
 
 
             } catch (err) {
@@ -65,6 +79,10 @@ const ActivityDetailPage: React.FC = () => {
         };
 
         fetchAllData();
+        if (activity && activity?.participants_count !== undefined) {
+            setNb_persone(activity.participants_count || 1);
+            setUser_nb_persone(activity.participants_count || 0);
+        }
     }, [id, isAuthenticated]);
 
     // ... (les fonctions de chargement et d'erreur ne changent pas)
@@ -130,6 +148,32 @@ const ActivityDetailPage: React.FC = () => {
         }
     };
 
+    const hendleDeleteBook = async  ()=>{
+        if (!isAuthenticated || !activity) {
+        navigate('/login', { state: { from: `/activities/${activity?.id}` } });
+        return;
+    }
+        setIsSubmitting(true);
+        try {
+        if (isRegistered) {
+            const bookings = (await axiosInstance.get<Booking[]>('/api/bookings/')).data;
+
+             const bookingToDelete = bookings.find(b => b.activity.id === activity.id);
+             if (bookingToDelete) {
+             await axiosInstance.delete(`/api/bookings/${bookingToDelete.id}/`);
+             setIsRegistered(false);
+             setActivity(prev => prev ? { ...prev, participants_count: prev.participants_count - nb_persone } : null);
+             }
+         }
+    } catch (err) {
+        console.error("Erreur lors de la mise à jour de l'inscription", err);
+        alert("Une erreur est survenue. Veuillez réessayer.");
+    } finally {
+        setIsSubmitting(false);
+    }
+
+    }
+
     const handleRegisterClick = async () => {
         if (!isAuthenticated || !activity) {
             navigate('/login', { state: { from: `/activities/${activity?.id}` } });
@@ -138,22 +182,29 @@ const ActivityDetailPage: React.FC = () => {
 
         setIsSubmitting(true);
         try {
-            if (isRegistered) {
-                const bookings = (await axiosInstance.get<Booking[]>('/api/bookings/')).data;
-                const bookingToDelete = bookings.find(b => b.activity.id === activity.id);
-                if (bookingToDelete) {
-                    await axiosInstance.delete(`/api/bookings/${bookingToDelete.id}/`);
-                    setIsRegistered(false);
-                    setActivity(prev => prev ? { ...prev, participants_count: prev.participants_count - 1 } : null);
-                }
-            } else {
-                await axiosInstance.post('/api/bookings/', { activity: activity.id ,number_of_places: nb_persone });
-                setIsRegistered(true);
-                setActivity(prev => prev ? { ...prev, participants_count: prev.participants_count + 1 } : null);
-            }
+            // 1. Envoyer la requête au Backend (S'inscrire ou Modifier)
+            const response = await axiosInstance.post('/api/bookings/', {
+                activity: activity.id,
+                nb_persone: nb_persone
+            });
+            console.log("response",response)
+
+            // 2. Mise à jour des états locaux
+            setIsRegistered(true);
+            setUser_nb_persone(nb_persone); // On mémorise le nouveau nombre de places de l'utilisateur
+
+            // 🚀 LA CORRECTION DU COMPTEUR :
+            // Au lieu de faire un calcul risqué (+ nb_persone), on recharge l'activité.
+            // Cela garantit que le participants_count affiché est EXACTEMENT celui de la base de données.
+            const updatedActivity = await axiosInstance.get(`/api/activities/${activity.id}/`);
+            setActivity(updatedActivity.data);
+
+            toast.success(isRegistered ? "Réservation mise à jour !" : "Inscription réussie !");
+
         } catch (err) {
-            console.error("Erreur lors de la mise à jour de l'inscription", err);
-            alert("Une erreur est survenue. Veuillez réessayer.");
+            console.error("Erreur lors de la réservation", err);
+            const errorMsg = "Une erreur est survenue. Veuillez réessayer.";
+            toast.error(errorMsg);
         } finally {
             setIsSubmitting(false);
         }
@@ -186,6 +237,7 @@ const ActivityDetailPage: React.FC = () => {
     };
     const isFull = activity.participants_count >= activity.max_participants;
     const isActivityPast = new Date(activity.start_time) < new Date();
+    console.log(nb_persone)
 
     return (
         <>
@@ -274,66 +326,92 @@ const ActivityDetailPage: React.FC = () => {
                                                     {/* Bloc Input */}
                                                     <div className="w-full sm:w-48">
                                                         <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                                                            Nombre de participants
+                                                            {isRegistered ? "Modifier vos places" : "Nombre de participants"}
                                                         </label>
-                                                        <div className="relative">
+                                                        <div className="flex items-center bg-gray-50 border border-gray-200 rounded-xl overflow-hidden px-2">
+                                                            {/* Bouton Moins (-) */}
+                                                            <button
+                                                                onClick={() => setNb_persone(Math.max(1, nb_persone - 1))}
+                                                                className="p-2 text-[#c44d00] hover:bg-gray-100 transition-colors font-bold text-xl"
+                                                            >
+                                                                −
+                                                            </button>
+
                                                             <input
-                                                                name="nb_persone"
                                                                 type="number"
                                                                 value={nb_persone}
-                                                                disabled={!activity}
-                                                                min="1"
-                                                                max={activity ? activity.max_participants - activity.participants_count : 1}
                                                                 onChange={e => {
                                                                     if (!activity) return;
-                                                                    const max = activity.max_participants || 0;
-                                                                    const current = activity.participants_count || 0;
-                                                                    const placesRestantes = max - current;
                                                                     const val = parseInt(e.target.value, 10);
+                                                                    const maxAllowed = (activity.max_participants - activity.participants_count) + (isRegistered ? nb_persone : 0);
 
-                                                                    if (isNaN(val) || val < 1) {
-                                                                        setNb_persone(1);
-                                                                    } else if (val > placesRestantes) {
-                                                                        setNb_persone(placesRestantes > 0 ? placesRestantes : 1);
-                                                                    } else {
-                                                                        setNb_persone(val);
-                                                                    }
+                                                                    if (isNaN(val) || val < 1) setNb_persone(1);
+                                                                    else if (val > maxAllowed) setNb_persone(maxAllowed);
+                                                                    else setNb_persone(val);
                                                                 }}
-                                                                required
-                                                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#c44d00] focus:border-transparent outline-none transition-all text-lg font-medium"
+                                                                className="w-full py-3 bg-transparent text-center outline-none font-bold text-lg"
                                                             />
+
+                                                            {/* Bouton Plus (+) */}
+                                                            <button
+                                                                onClick={() => {
+                                                                    const maxAllowed = (activity.max_participants - activity.participants_count) + (isRegistered ? nb_persone : 0);
+                                                                    if (nb_persone < maxAllowed) setNb_persone(nb_persone + 1);
+                                                                }}
+                                                                className="p-2 text-[#c44d00] hover:bg-gray-100 transition-colors font-bold text-xl"
+                                                            >
+                                                                +
+                                                            </button>
                                                         </div>
                                                         <p className="text-xs font-medium text-gray-500 mt-1.5 ml-1">
-                                                            {activity ? `${activity.max_participants - activity.participants_count} places libres` : 'Chargement...'}
+                                                            {isRegistered
+                                                                ? `Vous avez réservé ${user_nb_persone} place(s)`
+                                                                : `${activity?.max_participants - activity?.participants_count} places libres`}
                                                         </p>
                                                     </div>
 
-                                                    {/* Bouton d'action */}
+                                                    {/* Bouton d'Action Principal */}
                                                     <button
                                                         onClick={handleRegisterClick}
-                                                        disabled={isSubmitting || (isFull && !isRegistered)}
-                                                        className={`h-[52px] px-8 rounded-xl font-bold text-white shadow-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[200px]
-                        ${isRegistered
-                                                            ? 'bg-gray-600 hover:bg-gray-700 shadow-gray-200'
+                                                        disabled={isSubmitting || (isFull && !isRegistered && nb_persone > 0)}
+                                                        className={`h-[52px] px-8 rounded-xl font-bold text-white shadow-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 flex items-center justify-center min-w-[220px]
+                    ${isRegistered
+                                                            ? 'bg-blue-600 hover:bg-blue-700 shadow-blue-100' // Couleur différente pour "Mettre à jour"
                                                             : isFull
                                                                 ? 'bg-red-400 cursor-not-allowed'
-                                                                : 'bg-[#c44d00] hover:bg-[#a34000] shadow-orange-200'
+                                                                : 'bg-[#c44d00] hover:bg-[#a34000] shadow-orange-100'
                                                         }
-                    `}
+                `}
                                                     >
                                                         {isSubmitting ? (
                                                             <span className="flex items-center">
-                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                            Patientez...
-                        </span>
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Action...
+                    </span>
                                                         ) : isRegistered ? (
-                                                            'Se désinscrire'
-                                                        ) : isFull ? (
-                                                            'Complet'
+                                                            `Mettre à jour (${+activity.price * nb_persone} €)`
                                                         ) : (
                                                             `Réserver (${+activity.price * nb_persone} €)`
                                                         )}
                                                     </button>
+
+                                                    {/* Bouton Désinscription Totale (uniquement si déjà inscrit) */}
+                                                    {isRegistered && (
+                                                        <button
+                                                            onClick={() => {
+                                                                if(window.confirm("Voulez-vous annuler toute votre réservation ?")) {
+                                                                    setNb_persone(0); // Envoie 0 au backend pour tout supprimer
+                                                                    hendleDeleteBook();
+                                                                }
+                                                            }}
+                                                            className="h-[52px] px-4 text-red-600 hover:bg-red-50 rounded-xl font-medium transition-colors"
+                                                        >
+                                                            Annuler tout
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </div>
                                         );
