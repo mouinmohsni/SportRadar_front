@@ -111,7 +111,7 @@ export interface Activity {
 // ============================================
 
 export interface Booking {
-  nb_persone: any;
+  nb_persone: number;
   id: number;
   user: number; // ID de l'utilisateur
   activity: Activity; // Objet activité complet
