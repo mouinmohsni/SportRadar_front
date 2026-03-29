@@ -105,7 +105,7 @@ const HomePage: React.FC = () => {
                   <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                     <Link
                         to="/activities"
-                        className="bg-[#c44d00] text-white px-8 py-4 rounded-xl text-lg font-semibold hover:brightness-110 transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl flex items-center justify-center"
+                        className="bg-[#c44d00] text-bleau px-8 py-4 rounded-xl text-lg font-semibold hover:brightness-110 transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl flex items-center justify-center"
                     >
                       <span>Découvrir les activités</span>
                       <ArrowRight className="w-5 h-5 ml-2" />
