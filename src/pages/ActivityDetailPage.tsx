@@ -317,6 +317,22 @@ const ActivityDetailPage: React.FC = () => {
                             </div>
 
                             <div className="mt-8 border-t pt-6 flex justify-end">
+                                <div className="mt-4 flex items-center justify-center gap-2 text-gray-600">
+
+                                </div>
+                                {!isAuthenticated && (
+                                    <Link
+                                        to="/login"
+                                        className="bg-[#D85500] text-[#0A1128] font-bold px-4 py-2 rounded hover:bg-[#c44d00] transition-colors"
+                                        onClick={() => window.scrollTo(0, 0)}
+                                    >
+                                        S’inscrire
+                                    </Link>
+
+                                )}
+
+
+
                                 {(() => {
                                     // Cas 1 : L'utilisateur est un client ('personal')
                                     if (user?.type === 'personal') {
@@ -371,6 +387,7 @@ const ActivityDetailPage: React.FC = () => {
                                                     </div>
 
                                                     {/* Bouton d'Action Principal */}
+
                                                     <button
                                                         onClick={handleRegisterClick}
                                                         disabled={isSubmitting || (isFull && !isRegistered && nb_persone > 0)}
@@ -412,6 +429,7 @@ const ActivityDetailPage: React.FC = () => {
                                                             Annuler tout
                                                         </button>
                                                     )}
+
                                                 </div>
                                             </div>
                                         );
@@ -462,7 +480,9 @@ const ActivityDetailPage: React.FC = () => {
 
                                 })()}
                             </div>
-
+                            <p className="text-sm text-[#D85500] font-semibold mb-4 text-center italic">
+                                ℹ️ Le paiement s'effectue directement sur place auprès de l'organisateur.
+                            </p>
                         </div>
 
                         <div className="p-8 border-t">

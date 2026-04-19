@@ -1,6 +1,6 @@
 // File: src/pages/LoginPage.tsx
-import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {Link, useNavigate, useLocation, useSearchParams} from 'react-router-dom';
 import { Heart, User, Building, Mail, Lock, Eye, EyeOff, Briefcase, MapPin } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import axiosInstance from '../api/axiosInstance';
@@ -12,6 +12,8 @@ interface Me {
 }
 
 const LoginPage: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const typeParam = searchParams.get('type');
   const [accountType, setAccountType] = useState<'personal' | 'coach' | 'business'>('personal');
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
@@ -23,7 +25,8 @@ const LoginPage: React.FC = () => {
     // Infos Entreprise
     company_name: '',
     company_address: '',
-    company_phone: ''
+    company_phone: '',
+    numero_siret:""
   });
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -32,6 +35,16 @@ const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state as any)?.from as string | undefined;
+
+
+  useEffect(() => {
+
+    if (typeParam === 'coach' || typeParam === 'business') {
+
+      setAccountType(typeParam);
+      setIsLogin(false); // Cela bascule automatiquement sur l'onglet Inscription
+    }
+  }, [typeParam]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,9 +73,15 @@ const LoginPage: React.FC = () => {
           registerData.company_info = {
             name: formData.company_name,
             address: formData.company_address,
-            phone_number: formData.company_phone
+            phone_number: formData.company_phone,
+            numero_siret:formData.numero_siret
           };
+        }else if (accountType === 'coach') {
+          registerData.numero_siret=formData.numero_siret;
+
         }
+
+
 
         await axiosInstance.post('/api/users/', registerData);
         toast.success('Compte créé avec succès !');
@@ -220,6 +239,25 @@ const LoginPage: React.FC = () => {
                       </div>
                     </div>
                   </div>
+              )}
+
+              {!isLogin && accountType !== 'personal'&& (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Numéro SIRET</label>
+                    <div className="relative">
+                      <Building className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <input
+                          name="numero_siret"
+                          type="text"
+                          value={formData.numero_siret}
+                          onChange={handleInputChange}
+                          required
+                          className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#c44d00] outline-none"
+                          placeholder=" 912 345 678 00014"
+                      />
+                    </div>
+                  </div>
+
               )}
 
               <div>

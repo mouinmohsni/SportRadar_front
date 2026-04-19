@@ -71,7 +71,7 @@ const Header: React.FC = () => {
                   </Link>
                   <Link
                       to="/login"
-                      className="bg-[#c44d00] px-4 py-2 rounded hover:bg-[#b84f14] transition-colors"
+                      className="bg-[#D85500] text-[#0A1128]  px-4 py-2 rounded hover:bg-[#c44d00] transition-colors"
                       onClick={() => window.scrollTo(0, 0)}
                   >
                     Connexion

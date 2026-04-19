@@ -92,7 +92,7 @@ const ServicesPage: React.FC = () => {
                                 </p>
                                 <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                                     <Link
-                                        to="/login"
+                                        to="/login?type=business"
                                         className="bg-[#c44d00] text-white px-8 py-4 rounded-xl text-lg font-bold hover:bg-[#a34000] transition-all shadow-xl flex items-center justify-center group"
                                     >
                                         <span>Inscrire mon établissement</span>
@@ -206,7 +206,7 @@ const ServicesPage: React.FC = () => {
                             SportRadar n'est pas seulement pour les grandes salles. Les coaches indépendants peuvent aussi publier leurs séances, gérer leurs propres clients et bénéficier de notre visibilité.
                         </p>
                         <Link
-                            to="/login"
+                            to="/login?type=coach"
                             className="inline-flex items-center text-[#c44d00] font-bold text-lg hover:underline group"
                         >
                             S'inscrire en tant que Coach
@@ -225,7 +225,7 @@ const ServicesPage: React.FC = () => {
                             Rejoignez les centaines de professionnels qui font déjà confiance à SportRadar pour leur développement numérique.
                         </p>
                         <Link
-                            to="/login"
+                            to="/login?type=business"
                             className="bg-[#c44d00] text-white px-10 py-5 rounded-2xl text-xl font-bold hover:bg-[#a34000] transition-all shadow-2xl inline-block"
                         >
                             Démarrer gratuitement maintenant

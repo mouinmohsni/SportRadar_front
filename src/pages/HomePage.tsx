@@ -96,7 +96,7 @@ const HomePage: React.FC = () => {
                      Elle est unique et bien visible.
                 */}
                   <h1 className="text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-400 mb-6">
-                    Ici, maintenant, <span className="text-[#c44d00]">à ton rythme !</span>
+                    Ici, maintenant, <span className="text-[#D85500]">à ton rythme !</span>
                   </h1>
                   <p className="text-xl text-gray-400 mb-10 leading-relaxed">
                     SportRadar vous accompagne dans votre reprise d'activité sportive avec des recommandations personnalisées,
@@ -105,18 +105,19 @@ const HomePage: React.FC = () => {
                   <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                     <Link
                         to="/activities"
-                        className="bg-[#c44d00] text-bleau px-8 py-4 rounded-xl text-lg font-semibold hover:brightness-110 transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl flex items-center justify-center"
+                        className="bg-[#D85500] text-[#0A1128] px-8 py-4 rounded-xl text-lg font-bold hover:brightness-110 transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl flex items-center justify-center"
                     >
                       <span>Découvrir les activités</span>
                       <ArrowRight className="w-5 h-5 ml-2" />
                     </Link>
                     <Link
                         to="/login"
-                        className="border-2 border-[#c44d00] text-[#c44d00] px-8 py-4 rounded-xl text-lg font-semibold hover:bg-[#c44d00] hover:text-white transition-all duration-300 transform hover:scale-105"
+                        className="bg-[#D85500] text-[#0A1128] px-8 py-4 rounded-xl text-lg font-bold hover:bg-[#c44d00] transition-all duration-300 transform hover:scale-105 shadow-xl"
                     >
                       Créer mon compte
                     </Link>
                   </div>
+
                 </motion.div>
               </div>
             </div>
@@ -156,7 +157,7 @@ const HomePage: React.FC = () => {
                         onClick={() => navigate(link)}
                         className="cursor-pointer flex flex-col items-center text-center space-y-4 p-6 bg-[#ABC2D7] backdrop-blur-md rounded-2xl shadow-md hover:shadow-xl transition-shadow"
                     >
-                      <Icon className="w-10 h-10 text-[#c44d00]" />
+                      <Icon className="w-10 h-10 text-[#D85500]" />
                       {/*
                     5. La balise <h3> est maintenant correcte, car elle est sous un <h2>.
                   */}
