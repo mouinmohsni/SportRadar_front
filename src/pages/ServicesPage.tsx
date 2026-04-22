@@ -70,7 +70,7 @@ const ServicesPage: React.FC = () => {
             />
 
             <div className="min-h-screen font-sans text-gray-800 bg-gray-50">
-                2ig1
+
                 {/* HERO SECTION - PARLE AUX SALLES DE SPORT */}
                 <section className="relative bg-[#0a1128] py-24 lg:py-32 overflow-hidden">
                     {/* Décoration de fond */}
