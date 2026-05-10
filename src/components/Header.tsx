@@ -120,7 +120,7 @@ const Header: React.FC = () => {
                   {/*<NotificationCenter />*/}
                   <button
                       onClick={handleLogout}
-                      className="bg-[#c44d00] px-4 py-2 rounded hover:bg-[#b84f14] transition-colors"
+                      className="bg-[#c44d00] text-[#0A1128] px-4 py-2 rounded hover:bg-[#b84f14] transition-colors"
                   >
                     Déconnexion
                   </button>
@@ -168,7 +168,7 @@ const Header: React.FC = () => {
                   {/*<NotificationCenter />*/}
                   <button
                       onClick={handleLogout}
-                      className="bg-[#dc5f18] px-4 py-2 rounded hover:bg-[#b84f14] transition-colors"
+                      className="bg-[#dc5f18] text-[#0A1128] px-4 py-2 rounded hover:bg-[#b84f14] transition-colors"
                   >
                     Déconnexion
                   </button>
@@ -216,7 +216,7 @@ const Header: React.FC = () => {
                   {/*<NotificationCenter />*/}
                   <button
                       onClick={handleLogout}
-                      className="bg-[#dc5f18] px-4 py-2 rounded hover:bg-[#b84f14] transition-colors"
+                      className="bg-[#dc5f18]  text-[#0A1128] px-4 py-2 rounded hover:bg-[#b84f14] transition-colors"
                   >
                     Déconnexion
                   </button>
@@ -264,7 +264,7 @@ const Header: React.FC = () => {
                   {/*<NotificationCenter />*/}
                   <button
                       onClick={handleLogout}
-                      className="bg-[#dc5f18] px-4 py-2 rounded hover:bg-[#b84f14] transition-colors"
+                      className="bg-[#dc5f18] text-[#0A1128] px-4 py-2 rounded hover:bg-[#b84f14] transition-colors"
                   >
                     Déconnexion
                   </button>

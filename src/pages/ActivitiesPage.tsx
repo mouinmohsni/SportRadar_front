@@ -352,7 +352,7 @@ const ActivitiesPage: React.FC = () => {
                                                         ? 'bg-[#ABC2D7] text-[#0a1128] hover:bg-[#9ab0c5]'
                                                         : isFull
                                                             ? 'bg-gray-200 text-gray-600 cursor-not-allowed'
-                                                            : 'bg-[#c44d00] text-white hover:bg-[#b84f14]'
+                                                            : 'bg-[#dc5f18] text-[#0A1128] hover:bg-[#b84f14]'
                                                 }`}
                                             >
                                                 {isReg ? 'Se désinscrire' : isFull ? 'Complet' : "S'inscrire"}
@@ -361,7 +361,7 @@ const ActivitiesPage: React.FC = () => {
                                             // CAS 2 : L'utilisateur est un coach, un business, ou n'est pas connecté
                                             <button
                                                 onClick={() => window.location.href = `/activities/${act.id}`}
-                                                className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-300 font-semibold"
+                                                className="w-full bg-[#dc5f18] text-[#0A1128] py-2 px-4 rounded-lg hover:bg-[#b84f14] transition-colors duration-300 font-semibold"
                                             >
                                                 Voir les détails
                                             </button>

@@ -18,7 +18,8 @@ const CookieConsentBanner: React.FC = () => {
                 textAlign: "left"
             }}
             buttonStyle={{
-                color: "#FFFFFF",
+                color: "#0A1128",
+
                 background: "#F97316", // Fond orange pour correspondre à votre thème
                 fontSize: "14px",
                 fontWeight: "bold",

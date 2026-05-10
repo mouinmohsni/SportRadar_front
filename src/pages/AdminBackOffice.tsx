@@ -95,7 +95,7 @@ const AdminBackOffice: React.FC = () => {
           value={form.confirmPassword} onChange={handleChange}
           className="w-full p-2 border rounded"
         />
-        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">
+        <button type="submit" className="px-4 py-2 bg-[#dc5f18] text-[#0A1128] rounded">
           Créer compte Business
         </button>
       </form>

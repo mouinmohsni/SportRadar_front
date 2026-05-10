@@ -93,7 +93,7 @@ const ServicesPage: React.FC = () => {
                                 <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                                     <Link
                                         to="/login?type=business"
-                                        className="bg-[#c44d00] text-white px-8 py-4 rounded-xl text-lg font-bold hover:bg-[#a34000] transition-all shadow-xl flex items-center justify-center group"
+                                        className="bg-[#c44d00] text-[#0A1128] px-8 py-4 rounded-xl text-lg font-bold hover:bg-[#a34000] transition-all shadow-xl flex items-center justify-center group"
                                     >
                                         <span>Inscrire mon établissement</span>
                                         <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -226,7 +226,7 @@ const ServicesPage: React.FC = () => {
                         </p>
                         <Link
                             to="/login?type=business"
-                            className="bg-[#c44d00] text-white px-10 py-5 rounded-2xl text-xl font-bold hover:bg-[#a34000] transition-all shadow-2xl inline-block"
+                            className="bg-[#c44d00]   text-[#0A1128] px-10 py-5 rounded-2xl text-xl font-bold hover:bg-[#a34000] transition-all shadow-2xl inline-block"
                         >
                             Démarrer gratuitement maintenant
                         </Link>

@@ -103,7 +103,7 @@ const RecommendationsPage: React.FC = () => {
                         </p>
                         <button
                             onClick={() => navigate('/profile')}
-                            className="bg-[#c44d00] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#bf4f15] transition"
+                            className="bg-[#c44d00] text-[#0A1128] px-6 py-3 rounded-lg font-semibold hover:bg-[#bf4f15] transition"
                         >
                             Mes préférences
                         </button>

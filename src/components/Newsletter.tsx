@@ -42,7 +42,7 @@ const Newsletter: React.FC = () => {
           />
           <button
             type="submit"
-            className="bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-orange-700 transition duration-200"
+            className="bg-orange-600 text-[#0A1128] font-bold px-6 py-3 rounded-lg  hover:bg-orange-700 transition duration-200"
           >
             S'abonner
           </button>

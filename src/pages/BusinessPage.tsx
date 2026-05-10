@@ -289,7 +289,7 @@ const BusinessPage: React.FC = () => {
                 </ul>
                 <Link
                   to={`/subscribe/${planKeyFromName(plan.name)}`}
-                  className="block text-center bg-[#c44d00] text-white px-4 py-2 rounded-lg font-semibold hover:brightness-110 transition"
+                  className="block text-center bg-[#c44d00] text-[#0A1128] px-4 py-2 rounded-lg font-semibold hover:brightness-110 transition"
                 >
                   {plan.name === 'Abonnement sur mesure' ? 'Nous contacter' : 'Commencer'}
                 </Link>
@@ -324,7 +324,7 @@ const BusinessPage: React.FC = () => {
           </h2>
           <Link
             to="/corporate-offers"
-            className="inline-block bg-[#c44d00] text-white px-6 py-3 rounded-lg font-semibold hover:brightness-110 transition"
+            className="inline-block bg-[#c44d00] text-[#0A1128] px-6 py-3 rounded-lg font-semibold hover:brightness-110 transition"
           >
             Abonnez vos équipes !
           </Link>

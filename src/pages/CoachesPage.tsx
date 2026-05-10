@@ -216,7 +216,7 @@ const CoachesPage: React.FC = () => {
                                     </div>
 
                                     {/* Bouton d'action */}
-                                    <button className="mt-4 w-full bg-[#dc5f18] text-white py-2 rounded-lg font-semibold hover:bg-[#b84f14] transition-colors">
+                                    <button className="mt-4 w-full bg-[#dc5f18] text-[#0A1128] py-2 rounded-lg font-semibold hover:bg-[#b84f14] transition-colors">
                                         Voir le profil
                                     </button>
                                 </div>

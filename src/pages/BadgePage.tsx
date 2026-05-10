@@ -128,7 +128,7 @@ const BadgePage: React.FC = () => {
                         {/* onClick={() => navigate('/corporate-offers')} */}
                         <button
                             disabled
-                            className="bg-[#c44d00]/50 text-white px-8 py-4 rounded-xl text-lg font-semibold cursor-not-allowed transition relative group"
+                            className="bg-[#c44d00]/50 text-[#192133] px-8 py-4 rounded-xl text-lg font-semibold cursor-not-allowed transition relative group"
                             title="Cette fonctionnalité sera bientôt disponible"
                         >
                             Badge SportZen en construction

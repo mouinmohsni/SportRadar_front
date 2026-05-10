@@ -191,7 +191,7 @@ const CorporateOffersPage: React.FC = () => {
                                     <button
                                         onClick={() => setSelectedPlan(pl.key)}
                                         className={`w-full py-2 rounded-lg font-semibold transition ${selectedPlan === pl.key
-                                            ? 'bg-[#c44d00] text-white'
+                                            ? 'bg-[#c44d00] text-[#0A1128]'
                                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                             }`}
                                     >
@@ -277,7 +277,7 @@ const CorporateOffersPage: React.FC = () => {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full bg-[#c44d00] text-white py-3 rounded-lg font-semibold hover:brightness-110 disabled:opacity-50"
+                                className="w-full bg-[#c44d00] text-[#0A1128] py-3 rounded-lg font-semibold hover:brightness-110 disabled:opacity-50"
                             >
                                 {loading ? 'Envoi…' : 'Nous contacter'}
                             </button>
