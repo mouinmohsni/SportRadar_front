@@ -21,10 +21,11 @@ const LegalPage: React.FC = () => {
                         <h2 className="text-2xl font-semibold text-[#0a1128] mb-2">Éditeur</h2>
                         <p className="text-gray-700">
                             VitaMobilis <br />
-                            SAS au capital de 40 000 €<br />
-                            Siège social : 11 rue de la Santé, 75013 Paris, France<br />
-                            SIREN :  841 222 897  – RCS Paris 841 222 897 <br />
-                            contact@vitamobilis.fr – Tél. : 01 23 45 67 89<br />
+                            Adresse : 15 avenue de Marseille, 69007 Lyon, France<br />
+                            SAS - RCS Lyon 823 456 789 <br />
+                            SIREN :  841 222 897  <br />
+                             Email : contact@vitamobilis.fr <br/>
+                             Téléphone. : +33 4 66 85 94 91<br />
 
                         </p>
                     </section>
@@ -33,9 +34,9 @@ const LegalPage: React.FC = () => {
                     <section>
                         <h2 className="text-2xl font-semibold text-[#0a1128] mb-2">Hébergeur</h2>
                         <p className="text-gray-700">
-                            Vercel Inc.<br />
-                            340 S Lemon Ave #4133, Walnut, CA 91789, USA<br />
-                            Site : <a href="https://vercel.com" className="text-[#c44d00] hover:underline">vercel.com</a>
+                            render Inc.<br />
+                            525 Brannan St, 300, San Francisco, California 94107, US<br />
+                            Site : <a href="https://render.com" className="text-[#c44d00] hover:underline">render.com</a>
                         </p>
                     </section>
 
